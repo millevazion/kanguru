@@ -471,6 +471,37 @@ button:disabled {
   gap: 20px;
 }
 
+.sprint-dock {
+  position: sticky;
+  top: 16px;
+  z-index: 10;
+  background: #fff;
+  border-radius: 18px;
+  padding: 12px 16px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.sprint-dock-block {
+  display: grid;
+  gap: 4px;
+  min-width: 120px;
+}
+
+.sprint-dock-time {
+  font-size: 1.4rem;
+}
+
+.sprint-dock-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .sprint-header {
   display: grid;
   gap: 16px;
@@ -491,10 +522,10 @@ button:disabled {
 }
 
 .sprint-header-meta {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 16px;
-  align-items: center;
-  flex-wrap: wrap;
+  align-items: start;
 }
 
 .sprint-meta-block {
@@ -508,10 +539,6 @@ button:disabled {
   border: 1px solid rgba(31, 28, 25, 0.2);
   font-family: inherit;
   max-width: 180px;
-}
-
-.sprint-meta-action {
-  margin-left: auto;
 }
 
 .sprint-start-note {
@@ -585,6 +612,44 @@ button:disabled {
   align-items: center;
 }
 
+.admin-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.admin-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.admin-row {
+  display: grid;
+  gap: 6px;
+  background: var(--bg-alt);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.admin-row select {
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(31, 28, 25, 0.2);
+  font-family: inherit;
+}
+
+.admin-id {
+  font-weight: 700;
+}
+
 .badge {
   font-size: 0.8rem;
   font-weight: 700;
@@ -627,5 +692,14 @@ button:disabled {
 
   .toolbar-action .primary {
     justify-self: start;
+  }
+
+  .sprint-dock {
+    top: 8px;
+  }
+
+  .sprint-dock-actions {
+    width: 100%;
+    justify-content: flex-start;
   }
 }

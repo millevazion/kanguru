@@ -19,6 +19,7 @@ type ProgressState = Record<string, Attempt>;
 type Mode = 'practice' | 'review' | 'sprint';
 
 const STORAGE_KEY = 'kangaroo_progress_v2';
+const ANSWER_OVERRIDES_KEY = 'kangaroo_answer_overrides_v1';
 
 const choiceList: Choice[] = ['A', 'B', 'C', 'D', 'E'];
 
@@ -42,6 +43,22 @@ function saveProgress(progress: ProgressState) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
 }
 
+type AnswerOverrides = Record<string, Record<string, Choice>>;
+
+function loadAnswerOverrides(): AnswerOverrides {
+  try {
+    const stored = localStorage.getItem(ANSWER_OVERRIDES_KEY);
+    if (!stored) return {};
+    return JSON.parse(stored) as AnswerOverrides;
+  } catch {
+    return {};
+  }
+}
+
+function saveAnswerOverrides(overrides: AnswerOverrides) {
+  localStorage.setItem(ANSWER_OVERRIDES_KEY, JSON.stringify(overrides));
+}
+
 export default function App() {
   const [currentSetId, setCurrentSetId] = useState(questionSets[0].id);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -56,12 +73,27 @@ export default function App() {
   const [sprintStarted, setSprintStarted] = useState(false);
   const [sprintSubmitted, setSprintSubmitted] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [answerOverrides, setAnswerOverrides] = useState<AnswerOverrides>(() => loadAnswerOverrides());
+  const [showAdmin, setShowAdmin] = useState(false);
+
+  const adminMode = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return new URLSearchParams(window.location.search).has('admin');
+  }, []);
 
   const activeSet = questionSets.find((set) => set.id === currentSetId) ?? questionSets[0];
-  const questions = activeSet.questions;
+  const activeSetBaseQuestions = activeSet.questions;
+  const questions = useMemo(() => {
+    const overrides = answerOverrides[activeSet.id] ?? {};
+    return activeSetBaseQuestions.map((question) => ({
+      ...question,
+      correct: overrides[question.id] ?? question.correct
+    }));
+  }, [activeSet.id, activeSetBaseQuestions, answerOverrides]);
 
   const currentQuestion = questions[currentIndex];
   const attempt = progress[`${activeSet.id}-${currentQuestion.id}`] ?? {};
+  const currentIsCorrect = attempt.answer ? attempt.answer === currentQuestion.correct : null;
   const activePage = pageOverride ?? currentQuestion.page;
   const questionIdsByPage = useMemo(() => {
     const map = new Map<number, string[]>();
@@ -98,27 +130,33 @@ export default function App() {
     [sprintQuestions, progress, activeSet.id]
   );
   const sprintCorrectCount = useMemo(
-    () => sprintQuestions.filter((question) => progress[`${activeSet.id}-${question.id}`]?.isCorrect).length,
+    () => sprintQuestions.filter((question) => {
+      const answer = progress[`${activeSet.id}-${question.id}`]?.answer;
+      return answer ? answer === question.correct : false;
+    }).length,
     [sprintQuestions, progress, activeSet.id]
   );
 
   const totals = useMemo(() => {
-    const attempts = Object.entries(progress)
+    const answers = Object.entries(progress)
       .filter(([key]) => key.startsWith(activeSet.id))
-      .map(([, value]) => value);
-    const answered = attempts.filter((item) => item.answer);
-    const correct = attempts.filter((item) => item.isCorrect);
+      .map(([key, value]) => ({
+        id: key.split('-')[1],
+        answer: value.answer
+      }));
+    const answered = answers.filter((item) => item.answer);
+    const correct = answers.filter((item) => item.answer && item.answer === questions.find((q) => q.id === item.id)?.correct);
     return {
       answered: answered.length,
       correct: correct.length
     };
-  }, [progress, activeSet.id]);
+  }, [progress, activeSet.id, questions]);
 
   const computedScore = useMemo(() => {
     const rawScore = questions.reduce((sum, question) => {
       const item = progress[`${activeSet.id}-${question.id}`];
-      if (!item?.answer || item.isCorrect == null) return sum;
-      if (item.isCorrect) return sum + question.points;
+      if (!item?.answer) return sum;
+      if (item.answer === question.correct) return sum + question.points;
       return sum - question.points * 0.25;
     }, baseScore);
     return Math.max(0, rawScore);
@@ -130,10 +168,41 @@ export default function App() {
 
   const accuracy = totals.answered === 0 ? 0 : Math.round((totals.correct / totals.answered) * 100);
 
+  useEffect(() => {
+    saveAnswerOverrides(answerOverrides);
+  }, [answerOverrides]);
+
   const updateAttempt = (id: string, next: Attempt) => {
     const updated = { ...progress, [id]: next };
     setProgress(updated);
     saveProgress(updated);
+  };
+
+  const updateAnswerOverride = (questionId: string, value: Choice) => {
+    setAnswerOverrides((prev) => {
+      const original = activeSetBaseQuestions.find((q) => q.id === questionId)?.correct;
+      const next = { ...prev };
+      const setOverrides = { ...(next[activeSet.id] ?? {}) };
+      if (original && value === original) {
+        delete setOverrides[questionId];
+      } else {
+        setOverrides[questionId] = value;
+      }
+      if (Object.keys(setOverrides).length === 0) {
+        delete next[activeSet.id];
+      } else {
+        next[activeSet.id] = setOverrides;
+      }
+      return next;
+    });
+  };
+
+  const resetAnswerOverrides = () => {
+    setAnswerOverrides((prev) => {
+      const next = { ...prev };
+      delete next[activeSet.id];
+      return next;
+    });
   };
 
   const recordAnswer = (question: typeof questions[number], choice: Choice) => {
@@ -392,11 +461,17 @@ export default function App() {
             <p className="hint">Tap a question to return to practice.</p>
           </div>
           <div className="review-grid">
-            {questions.filter((q) => progress[`${activeSet.id}-${q.id}`]?.isCorrect === false).length === 0 ? (
+            {questions.filter((q) => {
+              const answer = progress[`${activeSet.id}-${q.id}`]?.answer;
+              return answer && answer !== q.correct;
+            }).length === 0 ? (
               <p className="neutral">No incorrect answers yet. Keep going or start a sprint.</p>
             ) : (
               questions
-                .filter((q) => progress[`${activeSet.id}-${q.id}`]?.isCorrect === false)
+                .filter((q) => {
+                  const answer = progress[`${activeSet.id}-${q.id}`]?.answer;
+                  return answer && answer !== q.correct;
+                })
                 .map((q) => (
                   <button
                     key={q.id}
@@ -418,6 +493,30 @@ export default function App() {
 
       {view === 'sprint' ? (
         <main className="sprint-layout">
+          <section className="sprint-dock">
+            <div className="sprint-dock-block">
+              <span className="label">Time</span>
+              <strong className="sprint-dock-time">{formatTime(sprintRemaining ?? 0)}</strong>
+              <span className="hint">
+                {sprintSubmitted ? 'Submitted' : sprintStarted ? (sprintPaused ? 'Paused' : 'Running') : 'Ready'}
+              </span>
+            </div>
+            <div className="sprint-dock-block">
+              <span className="label">Answered</span>
+              <strong>{sprintAnsweredCount} / {sprintQuestions.length || 6}</strong>
+            </div>
+            <div className="sprint-dock-block sprint-dock-actions">
+              <button
+                className="primary"
+                onClick={toggleSprint}
+                disabled={sprintSubmitted || sprintQuestions.length === 0}
+              >
+                {!sprintStarted ? 'Start sprint' : sprintPaused ? 'Resume' : 'Pause'}
+              </button>
+              {sprintSubmitted && <span className="badge good">Submitted</span>}
+            </div>
+          </section>
+
           <section className="panel sprint-header">
             <div className="sprint-header-top">
               <div>
@@ -426,22 +525,16 @@ export default function App() {
                 <p className="hint">Answer all six, then submit at the end to reveal answers and explanations.</p>
               </div>
               <div className="sprint-header-actions">
+                {adminMode && (
+                  <button className="ghost" onClick={() => setShowAdmin((value) => !value)}>
+                    {showAdmin ? 'Hide admin' : 'Admin'}
+                  </button>
+                )}
                 <button className="ghost" onClick={endSprint}>Exit sprint</button>
                 <button className="ghost" onClick={startSprint}>New set</button>
               </div>
             </div>
             <div className="sprint-header-meta">
-              <div className="sprint-meta-block">
-                <span className="label">Time</span>
-                <strong>{formatTime(sprintRemaining ?? 0)}</strong>
-                <span className="hint">
-                  {sprintSubmitted ? 'Submitted' : sprintStarted ? (sprintPaused ? 'Paused' : 'Running') : 'Ready'}
-                </span>
-              </div>
-              <div className="sprint-meta-block">
-                <span className="label">Answered</span>
-                <strong>{sprintAnsweredCount} / {sprintQuestions.length || 6}</strong>
-              </div>
               <div className="sprint-meta-block">
                 <span className="label">Year</span>
                 <select
@@ -455,14 +548,9 @@ export default function App() {
                   ))}
                 </select>
               </div>
-              <div className="sprint-meta-block sprint-meta-action">
-                <button
-                  className="primary"
-                  onClick={toggleSprint}
-                  disabled={sprintSubmitted || sprintQuestions.length === 0}
-                >
-                  {!sprintStarted ? 'Start sprint' : sprintPaused ? 'Resume' : 'Pause'}
-                </button>
+              <div className="sprint-meta-block">
+                <span className="label">Timer</span>
+                <p className="hint">12 minutes total. Starts on “Start sprint”.</p>
               </div>
             </div>
             {!sprintStarted && !sprintSubmitted && (
@@ -576,6 +664,38 @@ export default function App() {
               </div>
             )}
           </section>
+
+          {adminMode && showAdmin && (
+            <section className="panel admin-panel">
+              <div className="admin-head">
+                <div>
+                  <p className="eyebrow">Admin</p>
+                  <h3>Answer key overrides</h3>
+                  <p className="hint">Adjust answers for the current year. Overrides are saved locally.</p>
+                </div>
+                <button className="ghost" onClick={resetAnswerOverrides}>Reset overrides</button>
+              </div>
+              <div className="admin-grid">
+                {questions.map((question) => {
+                  const original = activeSetBaseQuestions.find((q) => q.id === question.id)?.correct ?? question.correct;
+                  return (
+                    <div key={question.id} className="admin-row">
+                      <span className="admin-id">{question.id}</span>
+                      <select
+                        value={question.correct}
+                        onChange={(event) => updateAnswerOverride(question.id, event.target.value as Choice)}
+                      >
+                        {choiceList.map((choice) => (
+                          <option key={choice} value={choice}>{choice}</option>
+                        ))}
+                      </select>
+                      <span className="hint">Default: {original}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
         </main>
       ) : (
         <main className="grid">
@@ -618,8 +738,8 @@ export default function App() {
             <div className="choice-grid">
               {choiceList.map((choice) => {
                 const isSelected = attempt.answer === choice;
-                const isCorrect = attempt.isCorrect && isSelected;
-                const isWrong = attempt.answer === choice && attempt.isCorrect === false;
+                const isCorrect = currentIsCorrect === true && isSelected;
+                const isWrong = currentIsCorrect === false && isSelected;
                 return (
                   <button
                     key={choice}
@@ -635,7 +755,7 @@ export default function App() {
 
             <div className="feedback">
               {attempt.answer ? (
-                attempt.isCorrect ? (
+                currentIsCorrect ? (
                   <p className="good">Nice! You picked {attempt.answer}. Keep the momentum.</p>
                 ) : (
                   <p className="bad">Not quite. Correct answer is {currentQuestion.correct}. Try a hint.</p>

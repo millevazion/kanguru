@@ -33,36 +33,6 @@ body {
   gap: 28px;
 }
 
-.sprint-bar {
-  position: sticky;
-  top: 16px;
-  z-index: 5;
-  background: #fff;
-  border-radius: 18px;
-  padding: 14px 18px;
-  box-shadow: var(--shadow);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.sprint-time {
-  font-size: 1.4rem;
-  margin-right: 12px;
-}
-
-.sprint-meta {
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
-.sprint-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
 
 .hero {
   display: grid;
@@ -496,49 +466,56 @@ button:disabled {
   text-align: left;
 }
 
-.sprint {
-  margin-top: 20px;
-  background: var(--bg-alt);
-  border-radius: 18px;
-  padding: 16px;
-}
-
-.sprint-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-}
-
 .sprint-layout {
   display: grid;
   gap: 20px;
 }
 
-.sprint-panel {
+.sprint-header {
   display: grid;
-  gap: 14px;
+  gap: 16px;
 }
 
-.sprint-panel-head {
+.sprint-header-top {
   display: flex;
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
 }
 
-.sprint-panel-actions {
+.sprint-header-actions {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
   align-items: center;
 }
 
-.sprint-panel-meta {
+.sprint-header-meta {
   display: flex;
   gap: 16px;
-  align-items: baseline;
+  align-items: center;
   flex-wrap: wrap;
+}
+
+.sprint-meta-block {
+  display: grid;
+  gap: 4px;
+}
+
+.sprint-meta-block select {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(31, 28, 25, 0.2);
+  font-family: inherit;
+  max-width: 180px;
+}
+
+.sprint-meta-action {
+  margin-left: auto;
+}
+
+.sprint-start-note {
+  margin: 0;
 }
 
 .sprint-stack {
@@ -588,20 +565,24 @@ button:disabled {
   gap: 6px;
 }
 
-.sprint-chip {
-  background: #fff;
-  border: 1px solid rgba(31, 28, 25, 0.2);
-  border-radius: 999px;
-  padding: 6px 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.sprint-submit {
+  display: grid;
+  gap: 12px;
 }
 
-.sprint-chip.active {
-  background: var(--accent-2);
-  color: #fff;
-  border-color: transparent;
+.sprint-submit-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.sprint-score {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .badge {
@@ -632,10 +613,6 @@ button:disabled {
 
   .choice-grid {
     grid-template-columns: 1fr 1fr;
-  }
-
-  .sprint-bar {
-    top: 8px;
   }
 
   .toolbar {

@@ -53,6 +53,7 @@ export default function App() {
   const [sprintSet, setSprintSet] = useState<number[]>([]);
   const [sprintRemaining, setSprintRemaining] = useState<number | null>(null);
   const [sprintPaused, setSprintPaused] = useState(false);
+  const [sprintStarted, setSprintStarted] = useState(false);
   const [sprintSubmitted, setSprintSubmitted] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
 
@@ -88,14 +89,16 @@ export default function App() {
   };
   const { story: storyExplanation, hint: contextualHint } = getExplanationFor(currentQuestion.id);
   const sprintActive = view === 'sprint' && sprintRemaining !== null;
-  const sprintDone = sprintRemaining === 0;
-  const sprintFinished = sprintSubmitted || sprintDone;
   const sprintQuestions = useMemo(
     () => sprintSet.flatMap((index) => (questions[index] ? [questions[index]] : [])),
     [sprintSet, questions]
   );
   const sprintAnsweredCount = useMemo(
     () => sprintQuestions.filter((question) => progress[`${activeSet.id}-${question.id}`]?.answer).length,
+    [sprintQuestions, progress, activeSet.id]
+  );
+  const sprintCorrectCount = useMemo(
+    () => sprintQuestions.filter((question) => progress[`${activeSet.id}-${question.id}`]?.isCorrect).length,
     [sprintQuestions, progress, activeSet.id]
   );
 
@@ -165,8 +168,9 @@ export default function App() {
     setPageOverride(null);
   };
 
-  const startSprint = () => {
-    const pool = questions.map((_, index) => index);
+  const startSprint = (setId: string = activeSet.id) => {
+    const chosenSet = questionSets.find((set) => set.id === setId) ?? activeSet;
+    const pool = chosenSet.questions.map((_, index) => index);
     for (let i = pool.length - 1; i > 0; i -= 1) {
       const j = Math.floor(Math.random() * (i + 1));
       [pool[i], pool[j]] = [pool[j], pool[i]];
@@ -174,23 +178,34 @@ export default function App() {
     const picked = pool.slice(0, Math.min(6, pool.length));
     setSprintSet(picked);
     setSprintRemaining(12 * 60);
-    setSprintPaused(false);
+    setSprintPaused(true);
+    setSprintStarted(false);
     setSprintSubmitted(false);
     if (picked.length > 0) {
       setCurrentIndex(picked[0]);
+    } else {
+      setCurrentIndex(0);
     }
+    setCurrentSetId(chosenSet.id);
     setPageOverride(null);
     setShowFullPage(false);
     setView('sprint');
   };
 
-  const pauseSprint = () => setSprintPaused(true);
-  const resumeSprint = () => setSprintPaused(false);
+  const toggleSprint = () => {
+    if (!sprintStarted) {
+      setSprintStarted(true);
+      setSprintPaused(false);
+      return;
+    }
+    setSprintPaused((value) => !value);
+  };
 
   const resetSprint = () => {
     setSprintRemaining(null);
     setSprintPaused(false);
     setSprintSet([]);
+    setSprintStarted(false);
     setSprintSubmitted(false);
   };
 
@@ -203,20 +218,31 @@ export default function App() {
     if (sprintSubmitted) return;
     setSprintSubmitted(true);
     setSprintPaused(true);
+    setSprintStarted(true);
   };
 
   useEffect(() => {
-    if (!sprintActive || sprintPaused || sprintRemaining === null || sprintRemaining <= 0 || sprintSubmitted) return;
+    if (
+      !sprintActive
+      || sprintPaused
+      || sprintRemaining === null
+      || sprintRemaining <= 0
+      || sprintSubmitted
+      || !sprintStarted
+    ) {
+      return;
+    }
     const interval = setInterval(() => {
       setSprintRemaining((value) => (value === null ? null : Math.max(0, value - 1)));
     }, 1000);
     return () => clearInterval(interval);
-  }, [sprintActive, sprintPaused, sprintRemaining, sprintSubmitted]);
+  }, [sprintActive, sprintPaused, sprintRemaining, sprintSubmitted, sprintStarted]);
 
   useEffect(() => {
     if (sprintRemaining === 0 && !sprintSubmitted) {
       setSprintSubmitted(true);
       setSprintPaused(true);
+      setSprintStarted(true);
     }
   }, [sprintRemaining, sprintSubmitted]);
 
@@ -262,123 +288,99 @@ export default function App() {
 
   return (
     <div className="app">
-      {sprintActive && (
-        <div className="sprint-bar">
-          <div>
-            <p className="eyebrow">Sprint mode</p>
-            <strong className="sprint-time">{formatTime(sprintRemaining ?? 0)}</strong>
-            <span className="sprint-meta">
-              {sprintSubmitted ? 'Submitted' : sprintPaused ? 'Paused' : 'Running'} · {sprintAnsweredCount}/{sprintQuestions.length || 6} answered
-            </span>
-            {sprintDone && <span className="badge bad">Time's up</span>}
-            {sprintSubmitted && !sprintDone && <span className="badge good">Submitted</span>}
-          </div>
-          <div className="sprint-actions">
-            {!sprintFinished && (
-              <button className="ghost" onClick={sprintPaused ? resumeSprint : pauseSprint}>
-                {sprintPaused ? 'Resume' : 'Pause'}
-              </button>
-            )}
-            {!sprintSubmitted && (
-              <button className="primary" onClick={submitSprint} disabled={sprintQuestions.length === 0}>
-                Submit sprint
-              </button>
-            )}
-            <button className="ghost" onClick={resetSprint}>Reset sprint</button>
-            <button className="ghost" onClick={endSprint}>End sprint</button>
-          </div>
-        </div>
+      {view !== 'sprint' && (
+        <>
+          <header className="hero">
+            <div>
+              <p className="eyebrow">Kangaroo Coach · Year 7-8</p>
+              <h1>Pick a question. Answer it. Learn fast.</h1>
+              <p className="subhead">
+                The question is shown as a picture (so diagrams are included). Answer below.
+              </p>
+              <div className="hero-actions">
+                <button className="primary" onClick={() => setView('practice')}>Start Practice</button>
+                <button className="primary outline" onClick={startSprint}>Start Sprint (6 questions)</button>
+              </div>
+            </div>
+            <div className="hero-card fade-in">
+              <div className="stat">
+                <span className="label">Answered</span>
+                <strong>{totals.answered} / {questions.length}</strong>
+              </div>
+              <div className="stat">
+                <span className="label">Accuracy</span>
+                <strong>{accuracy}%</strong>
+              </div>
+              <div className="stat">
+                <span className="label">Score</span>
+                <strong>{computedScore.toFixed(2)} / {maxScore}</strong>
+              </div>
+              <p className="hint">Score starts at 30. Correct adds 3/4/5. Wrong subtracts 0.25×points.</p>
+            </div>
+          </header>
+
+          <section className="mode-strip">
+            <button className={`mode-card ${view === 'practice' ? 'active' : ''}`} onClick={() => setView('practice')}>
+              <span className="mode-title">Practice</span>
+              <span className="mode-desc">One question at a time with hints.</span>
+            </button>
+            <button className={`mode-card ${view === 'review' ? 'active' : ''}`} onClick={() => setView('review')}>
+              <span className="mode-title">Review</span>
+              <span className="mode-desc">Return to mistakes and fix them.</span>
+            </button>
+            <button className={`mode-card ${view === 'sprint' ? 'active' : ''}`} onClick={startSprint}>
+              <span className="mode-title">Sprint</span>
+              <span className="mode-desc">6 questions, submit to reveal answers.</span>
+            </button>
+            <button className="mode-card ghost" onClick={resetProgress}>
+              <span className="mode-title">Reset</span>
+              <span className="mode-desc">Clear all saved answers.</span>
+            </button>
+          </section>
+
+          <section className="toolbar">
+            <div className="toolbar-group">
+              <span className="label">Year</span>
+              <select
+                value={activeSet.id}
+                onChange={(event) => {
+                  setCurrentSetId(event.target.value);
+                  setCurrentIndex(0);
+                  setPageOverride(null);
+                }}
+              >
+                {questionSets.map((set) => (
+                  <option key={set.id} value={set.id}>{set.label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="toolbar-group">
+              <span className="label">Jump to</span>
+              <select value={currentQuestion.id} onChange={(event) => jumpToQuestion(event.target.value)}>
+                <optgroup label="3-point (A)">
+                  {questions.filter((q) => q.section === 'A').map((q) => (
+                    <option key={q.id} value={q.id}>{q.id}</option>
+                  ))}
+                </optgroup>
+                <optgroup label="4-point (B)">
+                  {questions.filter((q) => q.section === 'B').map((q) => (
+                    <option key={q.id} value={q.id}>{q.id}</option>
+                  ))}
+                </optgroup>
+                <optgroup label="5-point (C)">
+                  {questions.filter((q) => q.section === 'C').map((q) => (
+                    <option key={q.id} value={q.id}>{q.id}</option>
+                  ))}
+                </optgroup>
+              </select>
+            </div>
+            <div className="toolbar-action">
+              <button className="primary" onClick={startSprint}>Sprint: 6 questions</button>
+              <span className="hint">12 minutes. Submit to see answers.</span>
+            </div>
+          </section>
+        </>
       )}
-
-      <header className="hero">
-        <div>
-          <p className="eyebrow">Kangaroo Coach · Year 7-8</p>
-          <h1>Pick a question. Answer it. Learn fast.</h1>
-          <p className="subhead">
-            The question is shown as a picture (so diagrams are included). Answer below.
-          </p>
-          <div className="hero-actions">
-            <button className="primary" onClick={() => setView('practice')}>Start Practice</button>
-            <button className="primary outline" onClick={startSprint}>Start Sprint (6 questions)</button>
-          </div>
-        </div>
-        <div className="hero-card fade-in">
-          <div className="stat">
-            <span className="label">Answered</span>
-            <strong>{totals.answered} / {questions.length}</strong>
-          </div>
-          <div className="stat">
-            <span className="label">Accuracy</span>
-            <strong>{accuracy}%</strong>
-          </div>
-          <div className="stat">
-            <span className="label">Score</span>
-            <strong>{computedScore.toFixed(2)} / {maxScore}</strong>
-          </div>
-          <p className="hint">Score starts at 30. Correct adds 3/4/5. Wrong subtracts 0.25×points.</p>
-        </div>
-      </header>
-
-      <section className="mode-strip">
-        <button className={`mode-card ${view === 'practice' ? 'active' : ''}`} onClick={() => setView('practice')}>
-          <span className="mode-title">Practice</span>
-          <span className="mode-desc">One question at a time with hints.</span>
-        </button>
-        <button className={`mode-card ${view === 'review' ? 'active' : ''}`} onClick={() => setView('review')}>
-          <span className="mode-title">Review</span>
-          <span className="mode-desc">Return to mistakes and fix them.</span>
-        </button>
-        <button className={`mode-card ${view === 'sprint' ? 'active' : ''}`} onClick={startSprint}>
-          <span className="mode-title">Sprint</span>
-          <span className="mode-desc">6 questions, submit to reveal answers.</span>
-        </button>
-        <button className="mode-card ghost" onClick={resetProgress}>
-          <span className="mode-title">Reset</span>
-          <span className="mode-desc">Clear all saved answers.</span>
-        </button>
-      </section>
-
-      <section className="toolbar">
-        <div className="toolbar-group">
-          <span className="label">Year</span>
-          <select
-            value={activeSet.id}
-            onChange={(event) => {
-              setCurrentSetId(event.target.value);
-              setCurrentIndex(0);
-              setPageOverride(null);
-            }}
-          >
-            {questionSets.map((set) => (
-              <option key={set.id} value={set.id}>{set.label}</option>
-            ))}
-          </select>
-        </div>
-        <div className="toolbar-group">
-          <span className="label">Jump to</span>
-          <select value={currentQuestion.id} onChange={(event) => jumpToQuestion(event.target.value)}>
-            <optgroup label="3-point (A)">
-              {questions.filter((q) => q.section === 'A').map((q) => (
-                <option key={q.id} value={q.id}>{q.id}</option>
-              ))}
-            </optgroup>
-            <optgroup label="4-point (B)">
-              {questions.filter((q) => q.section === 'B').map((q) => (
-                <option key={q.id} value={q.id}>{q.id}</option>
-              ))}
-            </optgroup>
-            <optgroup label="5-point (C)">
-              {questions.filter((q) => q.section === 'C').map((q) => (
-                <option key={q.id} value={q.id}>{q.id}</option>
-              ))}
-            </optgroup>
-          </select>
-        </div>
-        <div className="toolbar-action">
-          <button className="primary" onClick={startSprint}>Sprint: 6 questions</button>
-          <span className="hint">12 minutes. Submit to see answers.</span>
-        </div>
-      </section>
 
       {view === 'review' && (
         <section className="panel review">
@@ -416,26 +418,56 @@ export default function App() {
 
       {view === 'sprint' ? (
         <main className="sprint-layout">
-          <section className="panel sprint-panel">
-            <div className="sprint-panel-head">
+          <section className="panel sprint-header">
+            <div className="sprint-header-top">
               <div>
-                <p className="eyebrow">Sprint</p>
+                <p className="eyebrow">Sprint mode</p>
                 <h2>Six questions. One run.</h2>
-                <p className="hint">Answer all six, then submit to see the answers and explanations.</p>
+                <p className="hint">Answer all six, then submit at the end to reveal answers and explanations.</p>
               </div>
-              <div className="sprint-panel-actions">
-                <button className="primary" onClick={submitSprint} disabled={sprintSubmitted || sprintQuestions.length === 0}>
-                  {sprintSubmitted ? 'Submitted' : 'Submit sprint'}
+              <div className="sprint-header-actions">
+                <button className="ghost" onClick={endSprint}>Exit sprint</button>
+                <button className="ghost" onClick={startSprint}>New set</button>
+              </div>
+            </div>
+            <div className="sprint-header-meta">
+              <div className="sprint-meta-block">
+                <span className="label">Time</span>
+                <strong>{formatTime(sprintRemaining ?? 0)}</strong>
+                <span className="hint">
+                  {sprintSubmitted ? 'Submitted' : sprintStarted ? (sprintPaused ? 'Paused' : 'Running') : 'Ready'}
+                </span>
+              </div>
+              <div className="sprint-meta-block">
+                <span className="label">Answered</span>
+                <strong>{sprintAnsweredCount} / {sprintQuestions.length || 6}</strong>
+              </div>
+              <div className="sprint-meta-block">
+                <span className="label">Year</span>
+                <select
+                  value={activeSet.id}
+                  onChange={(event) => {
+                    startSprint(event.target.value);
+                  }}
+                >
+                  {questionSets.map((set) => (
+                    <option key={set.id} value={set.id}>{set.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="sprint-meta-block sprint-meta-action">
+                <button
+                  className="primary"
+                  onClick={toggleSprint}
+                  disabled={sprintSubmitted || sprintQuestions.length === 0}
+                >
+                  {!sprintStarted ? 'Start sprint' : sprintPaused ? 'Resume' : 'Pause'}
                 </button>
-                <button className="ghost" onClick={startSprint}>New sprint</button>
               </div>
             </div>
-            <div className="sprint-panel-meta">
-              <span className="label">Answered</span>
-              <strong>{sprintAnsweredCount} / {sprintQuestions.length || 6}</strong>
-              <span className="label">Time</span>
-              <strong>{formatTime(sprintRemaining ?? 0)}</strong>
-            </div>
+            {!sprintStarted && !sprintSubmitted && (
+              <p className="hint sprint-start-note">Timer starts when you press “Start sprint”.</p>
+            )}
           </section>
 
           <section className="sprint-stack">
@@ -509,6 +541,39 @@ export default function App() {
                   </article>
                 );
               })
+            )}
+          </section>
+
+          <section className="panel sprint-submit">
+            <div className="sprint-submit-head">
+              <div>
+                <p className="eyebrow">Submit</p>
+                <h3>{sprintSubmitted ? 'Results' : 'Ready to check?'}</h3>
+                <p className="hint">Submit to reveal answers and explanations for all six questions.</p>
+              </div>
+              {!sprintSubmitted && (
+                <button className="primary" onClick={submitSprint} disabled={sprintQuestions.length === 0}>
+                  Submit sprint
+                </button>
+              )}
+            </div>
+            {sprintSubmitted && (
+              <div className="sprint-score">
+                <div>
+                  <span className="label">Correct</span>
+                  <strong>{sprintCorrectCount} / {sprintQuestions.length || 6}</strong>
+                </div>
+                <div>
+                  <span className="label">Accuracy</span>
+                  <strong>
+                    {sprintQuestions.length
+                      ? Math.round((sprintCorrectCount / sprintQuestions.length) * 100)
+                      : 0}
+                    %
+                  </strong>
+                </div>
+                <button className="ghost" onClick={startSprint}>New sprint</button>
+              </div>
             )}
           </section>
         </main>

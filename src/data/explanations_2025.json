@@ -1,0 +1,122 @@
+{
+  "A1": {
+    "hint": "To find the biggest number, think about how to arrange the digits in the best order. Consider which digits are the largest and how their positions affect the overall value.",
+    "story": "To create the largest possible number, we need to arrange the digits 2, 0, 2, and 5 in a way that maximizes their value. Starting with the highest digit in the leftmost position will help us achieve the biggest number. After trying different combinations, we can find the correct arrangement."
+  },
+  "A2": {
+    "hint": "Think about how many times you need to rotate the hexagon for it to look the same as it did at the beginning. Each step changes its position.",
+    "story": "When Sami rotates the hexagonal piece of paper, he is changing its orientation. Since the hexagon has six sides, you can determine how many rotations it takes for the paper to return to its original appearance. After considering the pattern of the rotations, you will find that it takes 12 steps for the paper to look the same as it did at the start."
+  },
+  "A3": {
+    "hint": "Think about how you can arrange the numbers to create the smallest possible outcome. Consider the effects of subtraction and addition carefully.",
+    "story": "Vivienne has the numbers 1, 2, 3, and 4 to work with. She needs to choose one number for each box in the equation to find the smallest result. By strategically placing the numbers, she can achieve a result that is lower than any of the individual numbers. The smallest result she can get is actually -7."
+  },
+  "A4": {
+    "hint": "Think about how the card is folded and which numbers would be hidden from view. Visualize the folding process to determine which number remains visible.",
+    "story": "When the card is folded along the thick black lines, certain numbers will overlap and become hidden. By carefully analyzing the arrangement of the numbers and the folding pattern, you can identify which number is still visible. The answer is one of the options provided, and it requires a bit of spatial reasoning to figure it out."
+  },
+  "A5": {
+    "hint": "Count the total number of triangles in the hexagon and how many of them are grey. This will help you find the fraction.",
+    "story": "To determine the fraction of the hexagon that is grey, first, we need to find out how many triangles make up the entire hexagon. Then, by counting the grey triangles, we can compare the two numbers to find the correct fraction. The answer is likely to be a simple fraction of the whole."
+  },
+  "A6": {
+    "hint": "Think about the age difference between Louisa and her grandfather, and how their combined ages relate to the total given.",
+    "story": "Louisa was born when her grandfather turned 56, which means there is a 56-year age gap between them. If their combined ages equal 100 years, you can set up an equation to find out how old Louisa is. By solving this, you can determine her age."
+  },
+  "A7": {
+    "hint": "Look closely at the prices of the burgers that are visible. Remember that the prices increase as you go down the menu.",
+    "story": "To find the least amount a Deluxe burger could cost, we need to consider the prices of the burgers above it. Since the prices increase from top to bottom, the Deluxe burger must be more expensive than the burgers listed above it. By analyzing the visible prices, we can determine the minimum price for the Deluxe burger."
+  },
+  "A8": {
+    "hint": "Count how many cubes are on the edges where the ribbons are tied. Remember to consider the cubes that might be on the corners as well.",
+    "story": "To solve this problem, visualize the cuboid and the placement of the ribbons. The ribbons wrap around the cuboid, touching several cubes. By carefully counting the cubes that are in contact with the ribbons, you can find the total number that touch at least one of the ribbons."
+  },
+  "A9": {
+    "hint": "First, determine how many 12-minute intervals are in 12 hours. Then, think about how many eggs are packed in each interval.",
+    "story": "The machine packs 100 eggs every 12 minutes. To find out how many eggs it can pack in 12 hours, we need to calculate how many 12-minute intervals fit into 12 hours. Once we have that number, we can multiply it by 100 to find the total number of eggs packed."
+  },
+  "A10": {
+    "hint": "Think about the total number of dots and how many different numbers can appear on the dice.",
+    "story": "Sandra rolls three dice, and the total number of dots is 8. Since each die shows a different number, you can figure out which numbers could add up to 8 and which one must be missing. By analyzing the possible combinations, you can determine the number that Sandra definitely did not roll."
+  },
+  "B1": {
+    "hint": "Think about how the numbers change when you move two rows up on the dial. Pay attention to how the digits are affected.",
+    "story": "The bike's code starts at 0000 and changes to 8888 when moved two rows up. After setting it to the correct combination, it shows 2719 two rows above. By analyzing the changes in the digits, we can determine the correct code."
+  },
+  "B2": {
+    "hint": "Consider how the areas of the circles and the overlapping parts contribute to the total area. Remember to account for the overlaps carefully.",
+    "story": "To find the total area of the shape, first calculate the total area of the five circles. Since each circle has an area of 8 cm², you would multiply that by five. However, because some areas overlap, you need to subtract the overlapping areas to avoid counting them twice. After doing the math, you will find that the total area is 31 cm²."
+  },
+  "B3": {
+    "hint": "Start by determining the total distance covered by the hurdles and how far the last hurdle is from the finish line.",
+    "story": "In a 60-meter hurdle race, the first hurdle is placed 12 meters from the start. Since there are 5 hurdles and the distance between each is 8 meters, you can calculate the position of the last hurdle. By subtracting the distance of the last hurdle from the total race length, you can find out how far it is from the finish line."
+  },
+  "B4": {
+    "hint": "Think about how much time has passed and how much time is left in Jad's training. You can use subtraction to find the answer.",
+    "story": "Jad is training and checks two stopwatches: one shows the time that has passed, while the other shows the time remaining. To find out what time both stopwatches display when they are equal, you need to calculate the total training time and subtract the time that has passed. This will help you determine the correct time that both stopwatches show."
+  },
+  "B5": {
+    "hint": "Look closely at the existing circles and crosses in the rows above. You need to ensure that no row or column has three of the same symbol in a row.",
+    "story": "To solve this puzzle, we need to fill in the lowest row while following the rule of not having three consecutive circles or crosses. By examining the patterns in the rows above, we can determine the best way to fill in the boxes. The answer that fits these criteria is option D."
+  },
+  "B6": {
+    "hint": "Look at the numbers in the neighboring circles and think about how they relate to the grey circle. You can use addition and subtraction to find the missing number.",
+    "story": "In this problem, each circle's number is determined by the sum of its neighboring circles. By carefully analyzing the given numbers and their relationships, you can deduce what number should be placed in the grey circle. The answer you find will help complete the pattern."
+  },
+  "B7": {
+    "hint": "Think about how many people answered 'Yes' and what that means for the knights and robbers.",
+    "story": "In the castle, the noble knights always tell the truth, while the robber barons always lie. Since there are 8 more knights than robbers, the total number of 'Yes' answers gives us a clue about how many of each type of person is present. By setting up an equation based on the information given, we can find out how many robber barons are actually in the castle."
+  },
+  "B8": {
+    "hint": "Think about how many steps Willow needs to take to reach the cheese and how many choices he has at each step.",
+    "story": "Willow the mouse can only move right or down to reach the cheese. To find the total number of routes, consider the different combinations of right and down moves he can make. By calculating these combinations, you can determine how many unique paths lead to the cheese."
+  },
+  "B9": {
+    "hint": "Consider how long it takes Mohamad to walk to school and how that time changes when Diego cycles instead.",
+    "story": "Mohamad walks to school at a speed of 4 km/h and arrives 5 minutes early. To find out how early Diego is when he cycles at 15 km/h, we first need to calculate the time it takes Mohamad to walk to school. Then, we can determine the difference in time when Diego cycles, leading us to the answer."
+  },
+  "B10": {
+    "hint": "Remember that the angles in a straight line add up to 180 degrees. Use the angles you see to help find the missing one.",
+    "story": "In this problem, we have three rectangular photos, which means each corner of the photos has a right angle of 90 degrees. By knowing the angles of the other two photos, we can calculate the missing angle. The answer will be one of the options provided."
+  },
+  "C1": {
+    "hint": "Think about the relationship between the dimensions of the cuboid and the cube. Consider how the surface area and volume are affected when the top part is removed.",
+    "story": "To find the volume of the original cuboid, we need to establish the dimensions based on the information given. The height of the cube is 3 cm less than the original cuboid, and the surface area difference provides a crucial clue. By setting up equations based on these relationships, we can solve for the volume, which leads us to the correct answer."
+  },
+  "C2": {
+    "hint": "Think about the relationships between the numbers represented by A, P, and Y. Use the equation provided to help you find the value of P × A × P × A × Y × A.",
+    "story": "To solve for P × A × P × A × Y × A, we first need to determine the values of A, P, and Y based on the equation Y = P + P = A + A. Since A, P, and Y are different single-digit numbers, we can find their values and then calculate the expression. After working through the possibilities, we find that the answer is 648."
+  },
+  "C3": {
+    "hint": "Consider the properties of the angles and the relationships between the sides of the rectangle. You might want to use the fact that the angles are both 45 degrees to find the lengths.",
+    "story": "In rectangle ABCD, points E and F are positioned on side CD, creating two right triangles with angles BAF and EBA both measuring 45 degrees. Since the sum of the lengths AB and EF is given as 20 cm, you can use the properties of the triangles to determine the length of side BC. By analyzing the relationships between the angles and sides, you will find that the length of side BC is 12 cm."
+  },
+  "C4": {
+    "hint": "Think about how the average training time is calculated and how switching Mila affects both groups.",
+    "story": "To find out how long Mila trained, we need to consider the average training times of both groups before and after she switches. Since the average training time increases in both groups, Mila's training time must be higher than the average of the first group but lower than that of the second group. By analyzing the training times, we can deduce that Mila trained for 8 hours."
+  },
+  "C5": {
+    "hint": "Consider how the prime numbers can be combined to achieve the highest total. Remember that A must be a whole number.",
+    "story": "To find the maximum value of A, you need to add the smallest prime numbers together. The eight smallest prime numbers are 2, 3, 5, 7, 11, 13, 17, and 19. By strategically placing these numbers in the boxes, you can maximize the sum, leading to a whole number for A."
+  },
+  "C6": {
+    "hint": "Consider how many shots Oskar made at each hole and the percentage of successful hits for each. You can use these percentages to find out how many shots were aimed at the bottom right hole.",
+    "story": "Oskar took a total of 17 shots, dividing them between the two holes. Since he has a success rate of 60% for the top left hole, you can first determine how many shots he took there. The remaining shots would then be aimed at the bottom right hole, where 75% of those shots are successful."
+  },
+  "C7": {
+    "hint": "Think about the properties of consecutive numbers and how their sums relate to each other. Consider how the total sum of the five numbers can help you find the remaining number.",
+    "story": "You start with five consecutive whole numbers, which can be represented as n, n+1, n+2, n+3, and n+4. The total sum of these numbers is 5n + 10. After wiping two numbers that add up to 72, you can find the remaining number by determining how the sum changes. The answer will be one of the options provided."
+  },
+  "C8": {
+    "hint": "Think about how the colors at each vertex relate to each other when the octahedron is folded. Consider the colors of the regions that meet at the same vertex.",
+    "story": "When Jessika folds the octahedron, each vertex will have regions that need to be the same color. By analyzing the colors of the regions that connect at each vertex, we can determine the color for the region with the question mark. The correct choice ensures that all regions meeting at opposite vertices maintain the same color."
+  },
+  "C9": {
+    "hint": "Think about how many children are on each floor and how they relate to each other. Pay attention to the relationships given in the problem.",
+    "story": "Karim is in a four-story house with his friends, and we know the number of children above and below him. By organizing the information about how many children are on each floor and using the clues about multiples, we can find the total number of children at the camp."
+  },
+  "C10": {
+    "hint": "Think about what the labels on the chests mean and how they can help you determine the color of the beads inside.",
+    "story": "Fatima needs to find out where the red beads are, but Rachel has labeled the chests in a way that could be misleading. By choosing the right chest to look into, Fatima can eliminate possibilities and figure out the exact location of the red beads. The best choice will give her the most information about the color of the beads."
+  }
+}

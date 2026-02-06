@@ -1,0 +1,122 @@
+{
+  "A1": {
+    "hint": "First, calculate the sum inside the parentheses. Then, divide 2023 by that result.",
+    "story": "To solve the problem, you need to first add the numbers in the parentheses together. Once you have that sum, you can divide 2023 by it to find the answer. Remember to check your calculations carefully!"
+  },
+  "A2": {
+    "hint": "Think about how the bread would cover the grate. Consider the shape and size of the loaf in relation to the lines of the grate.",
+    "story": "When the loaf of bread is placed on the grate, it will cover some of the lines underneath. The part of the grate that is visible will depend on the shape of the bread and how it rests on the grate. By visualizing this, you can determine which option best represents the grate beneath the bread."
+  },
+  "A3": {
+    "hint": "Think about the properties of each shape and how they can be divided. Consider which shapes have parallel sides that might allow for such a division.",
+    "story": "To determine which figure cannot be divided into two trapezia with one straight line, we need to analyze the shapes. Some shapes, like the square and rectangle, have parallel sides that can easily be split into trapezia. However, one shape stands out because of its angles and sides, making it impossible to create two trapezia from it."
+  },
+  "A4": {
+    "hint": "Think about how the numbers on a clock are arranged and how rotating the disc affects what you see through the holes.",
+    "story": "When the dark disc is rotated, the position of the numbers changes in relation to the holes. If one hole shows a 10, you can figure out which number will be visible in the other hole by considering the distance between the numbers on the clock face."
+  },
+  "A5": {
+    "hint": "To find Marvin's age in years, think about how many days are in a year and how to convert days into years.",
+    "story": "Marvin has turned 10,000 days old today. To find out how many years that is, we can divide 10,000 by the number of days in a year, which is approximately 365. This calculation will help us determine that Marvin is between 13 and 19 years old."
+  },
+  "A6": {
+    "hint": "Think about how folding the foil along the dashed line would change the visibility of the numbers.",
+    "story": "When Kristina folds the transparent foil, the lines on it will overlap in a specific way. This means that some parts of the numbers will be hidden or combined, leading to a new number that can be seen. By carefully analyzing how the numbers align after the fold, we can determine what the new visible number is."
+  },
+  "A7": {
+    "hint": "Think about how many squares each figure covers and how they can fit together without leaving gaps.",
+    "story": "To solve this problem, we need to determine if each figure can fill the rectangle completely without any gaps or overlaps. By analyzing the shapes and their arrangements, we can find out which one cannot fit into the rectangle as required."
+  },
+  "A8": {
+    "hint": "Look closely at the directions and distances the cars will travel. Think about where they will end up after 5 seconds.",
+    "story": "To determine which cars will collide, we need to track their movements based on their starting positions and directions. By calculating where each car will be after 5 seconds, we can see if any of them end up in the same spot. The correct answer is B, which indicates the two cars that will meet."
+  },
+  "A9": {
+    "hint": "First, calculate how many learner drivers have already passed the theory test. Then, determine how many more need to pass for half of the total to have passed.",
+    "story": "There are 40 learner drivers, and 40% of them have passed the theory test. This means that a certain number of drivers still need to pass so that exactly half of the total, which is 20, have completed the test. By figuring out how many have already passed, you can find out how many more need to pass."
+  },
+  "A10": {
+    "hint": "Look at the numbers in the circles that are connected to the question mark. The relationship between the numbers will help you find the missing value.",
+    "story": "In this problem, each pair of neighboring circles adds up to a specific total. By using the numbers already provided, you can set up equations to find the missing number in the circle with the question mark. This will lead you to the correct answer, which is E."
+  },
+  "B1": {
+    "hint": "Think about how many matches each digit requires to be formed. Consider which combinations can create a valid natural number using exactly five matches.",
+    "story": "To solve this problem, we need to analyze how many matches are needed for each digit from 0 to 9. By counting the digits that can be formed with exactly five matches, we can find the total number of different natural numbers possible. Remember, a natural number cannot start with zero, which will help narrow down the options."
+  },
+  "B2": {
+    "hint": "Think about how the numbers in the rows and columns need to add up to the same total. You can use the numbers already placed to help find the missing one.",
+    "story": "Evita has already placed some numbers in the grid, and she needs to ensure that the sums of the rows and columns are equal. By calculating the totals of the existing numbers and considering the remaining options, she can determine which number fits in the grey box. The answer will help balance the sums correctly."
+  },
+  "B3": {
+    "hint": "Look closely at the pattern of symbols used for the three-digit numbers. Each symbol represents a digit, and the sequence follows a specific order.",
+    "story": "Laurenz is writing down three consecutive three-digit numbers, starting from the smallest. The symbols he uses represent the digits of these numbers in a specific pattern. To find the next number, you need to identify the sequence and determine what comes after the last symbol."
+  },
+  "B4": {
+    "hint": "Think about how you can choose three discs from the set while ensuring they are in decreasing size order.",
+    "story": "Marlene has several discs of different sizes and wants to create a tower with three of them. To build a valid tower, she must select discs that are smaller as she goes up. By considering the different combinations of discs she can choose, she can find the total number of unique towers she can build."
+  },
+  "B5": {
+    "hint": "Think about how you can arrange the animals so that each kangaroo has a beaver next to it. Consider the total number of animals and how they can be grouped.",
+    "story": "In a circle of 18 animals, each kangaroo must be adjacent to at least one beaver. To maximize the number of kangaroos, you need to find a way to arrange them while ensuring that the beavers are placed correctly. By strategically placing the beavers, you can determine the largest possible number of kangaroos that can fit in this arrangement."
+  },
+  "B6": {
+    "hint": "Consider how the scores relate to the number of arrows each person hit in the different rings.",
+    "story": "Lilly scored 46 points and John scored 34 points. Since each ring gives a different score, we can find out how many points Malik scored by analyzing the differences in their scores. By using the information given, we can determine Malik's score based on the scores of Lilly and John."
+  },
+  "B7": {
+    "hint": "Think about how many edges are on a cube and how many edges each face shares with others.",
+    "story": "A cube has six faces, and each face shares its edges with adjacent faces. To ensure that every face has at least one red edge, consider how many edges you need to color while minimizing the total. The solution involves strategically coloring edges to cover all faces."
+  },
+  "B8": {
+    "hint": "Look closely at the distances given and think about how they relate to the radius of the semicircles. You might need to use the total length of the straight line to help find the radius.",
+    "story": "To find the radius of the semicircles, we can analyze the distances provided. The total length of the straight line can give us clues about how the semicircles fit together. By using the lengths of the segments, we can determine the radius that satisfies the arrangement of the semicircles."
+  },
+  "B9": {
+    "hint": "Think about how to make both fractions equal by finding a common relationship between the numbers. Consider the properties of fractions and how they can be manipulated.",
+    "story": "To solve the problem, we need to set the two fractions equal to each other. This means we can cross-multiply to find a relationship between the square and the triangle. By analyzing the possible natural numbers that can replace the square, we can determine how many different values satisfy the equation."
+  },
+  "B10": {
+    "hint": "Remember that in an isosceles triangle, the angles opposite the equal sides are also equal. Use the given angle to find the other angles in the triangle.",
+    "story": "In triangle ABC, since it is isosceles with sides AC and BC being equal, the angles opposite these sides, EAC and DBA, must also be equal. Knowing that angle ACB is 40°, we can find the remaining angles and ultimately determine the size of angle BFE, which is related to the other angles in the triangle."
+  },
+  "C1": {
+    "hint": "Think about how the number of people in front of Louis relates to the number behind him. Also, consider the positions of his friends in the queue.",
+    "story": "Louis notices that the total number of people in the queue is a multiple of 3. Since he has the same number of people in front of him as behind him, you can use the positions of his friends to figure out where he stands. By analyzing their positions, you can deduce that Louis is in the 15th place."
+  },
+  "C2": {
+    "hint": "Consider how the grey squares are arranged and how their dimensions relate to the larger rectangle.",
+    "story": "Each grey square has an area of 16 cm², which means each side is 4 cm long. Since the grey squares form a rectangle, you can calculate the dimensions of the larger rectangle by considering the arrangement of these squares and their positions relative to the midpoints of the sides."
+  },
+  "C3": {
+    "hint": "Think about how many dwarfs are left after considering the ones each dwarf has played against.",
+    "story": "There are seven dwarfs in total, and each one has played against a different number of dwarfs. By adding up the dwarfs that each one has played against, you can figure out how many dwarfs Dopey played against."
+  },
+  "C4": {
+    "hint": "Think about the positions of the points in relation to the vertices of the square. Consider how many unique locations can be formed by moving away from two vertices.",
+    "story": "To solve this problem, visualize the square ABCD and the points that are exactly 1 cm away from two of its vertices. Each pair of vertices can create distinct points in the plane, leading to a total that can be calculated by considering all possible combinations. The answer involves counting these unique positions carefully."
+  },
+  "C5": {
+    "hint": "Think about how many times the number 7 can be used to reach 2023, considering the total number of summands needed.",
+    "story": "Finja has already used the number 7 to create 1015 by summing it 10 times. Now, she wants to reach 2023 using the digit 7 a total of 19 times. To find out how many times she needs to use the number 77, consider how the total can be achieved with the available summands."
+  },
+  "C6": {
+    "hint": "To find the average speed, you need to calculate the total distance and the total time taken for all three laps.",
+    "story": "Elisabeth runs three laps at different speeds. To find her average speed, we first need to determine how long each lap takes based on her speed. Then, we can use the total distance and total time to calculate her average speed, which is given as option B."
+  },
+  "C7": {
+    "hint": "Think about how the total number of mice remains the same, even though they moved houses. You need to compare the numbers from yesterday and today to find out how many mice changed their location.",
+    "story": "There are 20 mice in total, and each mouse moved to a different house. By looking at the numbers of mice in each house yesterday and today, we can determine how many mice took the path along the tree. The difference in the counts will help us find the answer."
+  },
+  "C8": {
+    "hint": "Consider the pairs of numbers that can be placed in adjacent cells. Think about how their products can be limited to 15.",
+    "story": "To solve this problem, we need to identify pairs of numbers from 1 to 9 that, when multiplied together, do not exceed 15. By systematically checking each pair of adjacent cells and counting the valid combinations, we can determine the total number of ways Konstantin can write the numbers."
+  },
+  "C9": {
+    "hint": "Think about how many rays you need to keep in order to form the required angles. Each angle needs two rays to be formed.",
+    "story": "Alina has drawn 10 rays, and each pair of adjacent rays forms a 10° angle. To ensure she can still create angles of 10°, 20°, 30°, 40°, 50°, 60°, 70°, 80°, and 90°, she needs to keep enough rays. By carefully considering the angles, she can determine the maximum number of rays she can erase while still being able to form all the required angles."
+  },
+  "C10": {
+    "hint": "To find the smallest number of goals in the 10th game, consider the total goals scored in the first nine games and how they relate to the average goals needed.",
+    "story": "The team scored a total of 33 + 27 + 29 goals in the first three games, and we need to find out how many goals they scored in the 10th game to ensure their average after 10 games is greater than 30. Since the average after 9 games was already higher than after 6 games, we can deduce that they need to score enough in the 10th game to maintain that average. The smallest possible number of goals they could score in the 10th game is 34."
+  }
+}

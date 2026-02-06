@@ -1,0 +1,122 @@
+{
+  "A1": {
+    "hint": "Think about how many times the string crosses over itself. This can help you determine which shapes can be laid down without cutting.",
+    "story": "To solve this problem, we need to visualize how each string can be manipulated. The goal is to find a string that cannot be laid down in the same way as the reference string without making a cut. By examining the crossings and loops, we can identify the string that stands out as different."
+  },
+  "A2": {
+    "hint": "Look closely at the shapes and the lines on each piece. Consider how they might connect to create two closed curves.",
+    "story": "To solve this puzzle, you need to visualize how each piece fits into the middle space. The goal is to ensure that the lines from the surrounding pieces connect seamlessly to form two distinct closed curves. After examining each option, you will find that one piece fits perfectly, allowing for the desired shape."
+  },
+  "A3": {
+    "hint": "Remember to follow the order of operations: multiplication and addition come before division. Calculate each part step by step.",
+    "story": "First, you need to multiply 20 by 24 to find the total. Then, calculate the expression in the parentheses, which involves multiplication and addition. Finally, divide the first result by the second to find the answer."
+  },
+  "A4": {
+    "hint": "Think about how many corners a tetrahedron has and what happens when you cut off each corner.",
+    "story": "A tetrahedron has four triangular faces and four vertices. When you cut off each of the four corners, you create new vertices at the cut points. To find the total number of vertices in the new shape, consider both the original vertices and the new ones created by the cuts."
+  },
+  "A5": {
+    "hint": "Think about how many different ways you can arrange the digits on the cards to form a four-digit number. Remember that the first digit cannot be zero.",
+    "story": "Margarethe has three cards with the digits 1, 5, and 11. To create four-digit numbers, she needs to consider how to use these digits in different positions. Since she can repeat digits and must ensure the first digit is not zero, she can find several combinations. The total number of unique four-digit numbers she can create is more than just a few."
+  },
+  "A6": {
+    "hint": "Think about how many adults are already using the elevator and how that affects the total capacity for children.",
+    "story": "The elevator can hold a maximum of 12 adults or 20 children. If 9 adults are already using the elevator, we need to find out how many children can fit without exceeding the total weight limit. By calculating the remaining capacity, we can determine the maximum number of children allowed."
+  },
+  "A7": {
+    "hint": "Look closely at the table to see when Nils is available. Consider the times that are already taken by others.",
+    "story": "The Cheek family has appointments at different times, and we need to find out when Nils can go. By checking the table, we can see which times are marked for each family member. After analyzing the available slots, we find that Nils will have his turn at 17:00."
+  },
+  "A8": {
+    "hint": "Think about how the colors alternate in a pattern. Count the sections carefully to find the total number of gray areas.",
+    "story": "Eliza's tent is designed with alternating colors, creating a pattern that repeats. To find the number of gray areas, you need to visualize how many sections there are in total and how they are arranged. By carefully counting the sections, you can determine that the answer is 22."
+  },
+  "A9": {
+    "hint": "Think about how the products given can help you figure out the pairs of numbers. Remember, each number must be different and natural.",
+    "story": "To solve this problem, you need to find four different natural numbers that fit the products given for each row and column. By carefully analyzing the products, you can deduce the possible pairs of numbers. Once you have those, add them together to find the sum, which is the answer you're looking for."
+  },
+  "A10": {
+    "hint": "Think about how the areas of the shapes relate to each other. Consider how the triangles contribute to the overall area of the rectangle compared to the rhombus.",
+    "story": "To solve this problem, we need to find the areas of both the rectangle and the rhombus. The rectangle is formed by adding the areas of the four triangles to the rhombus, which means the rectangle's area will be larger. By calculating the difference in areas, we can determine the percentage increase from the rhombus to the rectangle."
+  },
+  "B1": {
+    "hint": "Look closely at the sums of the numbers in the rows and columns. You need to find a piece that balances the total.",
+    "story": "To solve this problem, we need to ensure that the total of each row and column in the 4x4 square is the same. By examining the existing pieces and their values, we can deduce what the fourth piece must look like to maintain this balance. The correct piece is option B."
+  },
+  "B2": {
+    "hint": "Think about how many different pairs can be formed from the three friends and how the remaining friend will be assigned to one of the cabs.",
+    "story": "Maria, Yegor, and Leela need to decide how to split into two air cabs. Since there are two cabs and three friends, one cab will have two friends while the other will have one. By considering the different combinations of friends in each cab, you can find the total number of ways they can split up."
+  },
+  "B3": {
+    "hint": "Remember that the numbers on opposite sides of a die always add up to 7. Think about how the die moves along the path.",
+    "story": "To solve this problem, we need to track how the die moves as Jamie tilts it. Starting with the number 4 on top, we can determine which numbers appear on top after each tilt. By carefully following the path and considering the opposite sides, we can find the final number on top."
+  },
+  "B4": {
+    "hint": "Think about how many pieces of cake are left after Denise ate one. Then, consider how to divide the full circle into equal angles based on the remaining pieces.",
+    "story": "Denise baked a cake and cut it into 10 equal pieces. After eating one piece, she has 9 pieces left to arrange. Since a full circle is 360 degrees, you can find the angle between any two remaining pieces by dividing 360 by the number of gaps created by the 9 pieces."
+  },
+  "B5": {
+    "hint": "Think about how many different digits are needed to represent all possible days and months. Remember that the digits must be arranged in a way that they can be read upright.",
+    "story": "Marta wants to display the date using four magnets, with each magnet showing a single digit. To represent all possible days (01 to 31) and months (01 to 12), she needs to consider the digits required for both. By analyzing the combinations, we find that the smallest number of magnets she needs is 20."
+  },
+  "B6": {
+    "hint": "Think about how symmetry works in a square. You need to ensure that the colored boxes are balanced on both sides.",
+    "story": "Aila wants to create a square that looks the same when folded along a line. To achieve this, she must carefully choose which two boxes to color, considering the existing black boxes and their positions. By exploring different combinations, she can find the total number of ways to achieve symmetry."
+  },
+  "B7": {
+    "hint": "Think about how many ravioli were originally on each plate before grandma took some. Remember that she took the same amount from each of the 6 plates.",
+    "story": "Nico's grandpa divided the ravioli evenly across 6 plates. When grandma took 3 ravioli from each plate, she took a total of 6 ravioli, which is the same amount as what was on 2 plates. This means that the original number of ravioli on each plate must be 5."
+  },
+  "B8": {
+    "hint": "To find the perimeter of the fourth rectangle, you can use the total perimeter of the large rectangle and subtract the perimeters of the three smaller rectangles.",
+    "story": "The large rectangle is divided into four smaller rectangles, and we know the perimeters of three of them. By adding the known perimeters and comparing them to the total perimeter of the large rectangle, we can determine the missing perimeter of the fourth rectangle. This will lead us to the correct answer."
+  },
+  "B9": {
+    "hint": "Consider how many jumps the kangaroo makes uphill and downhill, and how far it travels in each direction.",
+    "story": "The kangaroo makes a total of 2024 jumps, which includes both uphill and downhill jumps. To find the total distance covered, you need to calculate the distance for each part of the journey and then add them together. Remember, the uphill distance is different from the downhill distance due to the different jump lengths."
+  },
+  "B10": {
+    "hint": "Consider the properties of the triangles involved, especially the right angle and the isosceles triangle. Use the angles you know to find the unknown angle.",
+    "story": "In this problem, we have a right triangle and an isosceles triangle, which gives us specific angle relationships. Since triangle QST is equilateral, all its angles are equal, and knowing one angle helps us find the others. By using the given angle of 41° and the properties of the triangles, we can determine the measure of angle PTS."
+  },
+  "C1": {
+    "hint": "Remember that only one pirate has counted correctly, while the others have made mistakes. You need to find a way to determine which counts could be accurate based on the total number of coins.",
+    "story": "There are four pirates who have counted their coins, but only one of them is correct. Since the total number of coins is 30, you can use the information from the incorrect counts to figure out how many gold coins were captured. By analyzing the counts and the total, you can deduce the correct number of gold coins."
+  },
+  "C2": {
+    "hint": "Think about how many fingers each child shows with both hands combined. Remember to consider the total number of fingers shown with their left hands.",
+    "story": "Each child shows 9 fingers with their right hands and a total of 26 fingers with their left hands. To find out how many fingers they show with their right hands, you can subtract the left hand total from the overall total. This will help you determine the number of fingers shown with their right hands."
+  },
+  "C3": {
+    "hint": "Think about how many faces of the new solid are exposed after gluing the first six cubes. You need to cover all the exposed faces with additional cubes.",
+    "story": "Amir starts with a single cube and glues six cubes to it, covering all of its faces. After this, he needs to determine how many more cubes are necessary to cover the exposed faces of the new solid. By carefully calculating the number of exposed faces, he can find the smallest number of additional cubes needed."
+  },
+  "C4": {
+    "hint": "Think about how many apples are in each basket and how the number of red apples changes after the customer buys one basket.",
+    "story": "Ilona has several baskets of apples, and one customer buys a whole basket. After this purchase, the number of red apples becomes twice the number of yellow apples left. To find out how many apples the customer bought, consider the total apples in each basket and how the ratios change."
+  },
+  "C5": {
+    "hint": "To find the length of a single trolley, you can use the total lengths of the sets and the number of trolleys in each set.",
+    "story": "You know that four trolleys together measure 156 cm and ten trolleys measure 264 cm. By setting up equations based on these total lengths, you can find the length of one trolley. After calculating, you will discover the correct answer."
+  },
+  "C6": {
+    "hint": "Consider the relationships between the numbers each person has based on their statements. Think about how the numbers can fit together.",
+    "story": "David has two numbers where one is 5 greater than the other, which limits his options. Anastasia's numbers add up to 6, and Lennox's numbers have a doubling relationship. By analyzing these conditions, we can deduce which number is left on the table."
+  },
+  "C7": {
+    "hint": "Think about how the semicircles fit within the rectangle and how their heights relate to the rectangle's dimensions.",
+    "story": "To find the perimeter of the rectangle, first calculate its height by adding the distances from the semicircles to the top of the rectangle. The total height is the sum of the distances from the medium-sized semicircle (5 cm) and the small semicircle (7 cm). Then, use the length of the rectangle (36 cm) to find the perimeter using the formula for the perimeter of a rectangle."
+  },
+  "C8": {
+    "hint": "Consider the factors of 180 and how they can be paired to form the product. Remember that the numbers in the box below must multiply to give 180.",
+    "story": "To find the different numbers that can go in the box with the question mark, we need to look at the factors of 180. Each pair of neighboring boxes must multiply to give the number above them. By examining the factor pairs of 180, we can determine how many different natural numbers greater than 1 can fit in that box."
+  },
+  "C9": {
+    "hint": "Consider how the segments BD, DE, and EF create equal areas within the triangle. Think about the relationship between the lengths of the segments and the areas they enclose.",
+    "story": "To solve this problem, we need to understand that the segments BD, DE, and EF must divide the triangle ABC into four smaller triangles of equal area. Since the total area of triangle ABC can be calculated, we can use that to find the lengths of the segments. By analyzing the areas and the proportions, we can determine that the length of segment CF is 47 cm."
+  },
+  "C10": {
+    "hint": "Think about the distances each person travels and their speeds. How does their speed difference affect when they meet again?",
+    "story": "Lene and Mattea start their journeys at the same time, but Mattea is much faster. After they meet for the first time, Lene continues at her slower speed while Mattea speeds ahead. To find out when they will meet again, consider how far each has traveled since their first meeting."
+  }
+}

@@ -36,6 +36,7 @@ export default function QuestionCard({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [doc, setDoc] = useState<PDFDocumentProxy | null>(null);
   const [status, setStatus] = useState<Status>('loading');
+  const [highlight, setHighlight] = useState<{ x: number; y: number; boxTop: number; boxHeight: number } | null>(null);
   const pageCacheRef = useRef<Map<string, number>>(new Map());
 
   useEffect(() => {
@@ -286,6 +287,16 @@ export default function QuestionCard({
       canvas.height = cropHeight;
       context.clearRect(0, 0, canvas.width, canvas.height);
       context.drawImage(renderCanvas, cropLeft, top, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+      if (hasCurrent) {
+        const markerX = Math.max(10, currentPos!.x - cropLeft - 6);
+        const markerY = Math.max(12, currentPos!.y - top - 18);
+        const boxTop = Math.max(8, currentPos!.y - top - 8);
+        const inferredHeight = Math.max(140, Math.min(240, bottom - top));
+        const boxHeight = Math.min(cropHeight - boxTop - 8, inferredHeight);
+        setHighlight({ x: markerX, y: markerY, boxTop, boxHeight });
+      } else {
+        setHighlight(null);
+      }
       setStatus('ready');
     };
 
@@ -303,7 +314,23 @@ export default function QuestionCard({
       {status === 'error' ? (
         <div className="pdf-error">Question preview could not be loaded.</div>
       ) : (
-        <canvas ref={canvasRef} />
+        <>
+          <canvas ref={canvasRef} />
+          {highlight && (
+            <>
+              <div
+                className="question-highlight"
+                style={{ top: `${highlight.boxTop}px`, height: `${highlight.boxHeight}px` }}
+              />
+              <div
+                className="question-marker"
+                style={{ left: `${highlight.x}px`, top: `${highlight.y}px` }}
+              >
+                {questionId}
+              </div>
+            </>
+          )}
+        </>
       )}
       {status === 'loading' && <div className="pdf-loading">Loading question...</div>}
     </div>

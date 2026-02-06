@@ -11,6 +11,8 @@ type QuestionCardProps = {
   questionIdsOnPage: string[];
   nextQuestionId?: string;
   scale: number;
+  labelPositions?: Record<string, { x: number; y: number }>;
+  pageSize?: { width: number; height: number };
 };
 
 type Status = 'loading' | 'ready' | 'error';
@@ -21,7 +23,16 @@ type LineItem = { text: string; x: number; y: number };
 type Line = { y: number; items: LineItem[] };
 type Position = { id: string; x: number; y: number };
 
-export default function QuestionCard({ url, page, questionId, questionIdsOnPage, nextQuestionId, scale }: QuestionCardProps) {
+export default function QuestionCard({
+  url,
+  page,
+  questionId,
+  questionIdsOnPage,
+  nextQuestionId,
+  scale,
+  labelPositions,
+  pageSize
+}: QuestionCardProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [doc, setDoc] = useState<PDFDocumentProxy | null>(null);
   const [status, setStatus] = useState<Status>('loading');
@@ -53,12 +64,39 @@ export default function QuestionCard({ url, page, questionId, questionIdsOnPage,
 
     const render = async () => {
       setStatus('loading');
-      const cachedPage = pageCacheRef.current.get(questionId);
-      const candidatePages = cachedPage ? [cachedPage] : [page, ...Array.from({ length: doc.numPages }, (_, i) => i + 1)];
+      const hasLabelPositions = !!labelPositions && !!pageSize;
+      const cachedPage = hasLabelPositions ? null : pageCacheRef.current.get(questionId);
+      const candidatePages = hasLabelPositions
+        ? [page]
+        : cachedPage
+          ? [cachedPage]
+          : [page, ...Array.from({ length: doc.numPages }, (_, i) => i + 1)];
 
       const findYOnPage = async (pageNumber: number) => {
         const pageObj = await doc.getPage(pageNumber);
         const viewport = pageObj.getViewport({ scale });
+        const currentPosRaw = hasLabelPositions ? labelPositions?.[questionId] ?? null : null;
+        if (hasLabelPositions && pageNumber === page && currentPosRaw) {
+          const scaleX = viewport.width / pageSize!.width;
+          const scaleY = viewport.height / pageSize!.height;
+          const positions = questionIdsOnPage
+            .map((id) => {
+              const pos = labelPositions?.[id];
+              if (!pos) return null;
+              return { id, x: pos.x * scaleX, y: pos.y * scaleY };
+            })
+            .filter(Boolean) as Position[];
+          const nextPosRaw = nextQuestionId ? labelPositions?.[nextQuestionId] ?? null : null;
+          return {
+            pageObj,
+            viewport,
+            textContent: null,
+            positions,
+            currentPos: currentPosRaw ? { id: questionId, x: currentPosRaw.x * scaleX, y: currentPosRaw.y * scaleY } : null,
+            nextPos: nextPosRaw ? { id: nextQuestionId ?? '', x: nextPosRaw.x * scaleX, y: nextPosRaw.y * scaleY } : null
+          };
+        }
+
         const textContent = await pageObj.getTextContent();
         const items: LineItem[] = [];
         for (const item of textContent.items) {

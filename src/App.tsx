@@ -3,6 +3,9 @@ import PdfPageViewer from './components/PdfPageViewer';
 import QuestionCard from './components/QuestionCard';
 import { baseScore, questionSets } from './data/questionBank';
 import { explanations, explanationSources } from './data/explanations';
+import labelPositions2025 from './data/label_positions_2025.json';
+import labelPositions2024 from './data/label_positions_2024.json';
+import labelPositions2023 from './data/label_positions_2023.json';
 
 type Choice = 'A' | 'B' | 'C' | 'D' | 'E';
 
@@ -17,6 +20,10 @@ type Attempt = {
 type ProgressState = Record<string, Attempt>;
 
 type Mode = 'practice' | 'review' | 'sprint';
+type LabelPositions = {
+  pageSizes: Record<string, { width: number; height: number }>;
+  labels: Record<string, Record<string, { x: number; y: number }>>;
+};
 
 const STORAGE_KEY = 'kangaroo_progress_v2';
 const choiceList: Choice[] = ['A', 'B', 'C', 'D', 'E'];
@@ -71,7 +78,14 @@ export default function App() {
     return new URLSearchParams(window.location.search).has('admin');
   }, []);
 
+  const labelPositionsByYear: Record<string, LabelPositions> = {
+    '2025': labelPositions2025 as LabelPositions,
+    '2024': labelPositions2024 as LabelPositions,
+    '2023': labelPositions2023 as LabelPositions
+  };
+
   const activeSet = questionSets.find((set) => set.id === currentSetId) ?? questionSets[0];
+  const activeLabelPositions = labelPositionsByYear[activeSet.id];
   const activeSetBaseQuestions = activeSet.questions;
   const questions = useMemo(() => {
     const overrides = answerOverrides[activeSet.id] ?? {};
@@ -656,6 +670,8 @@ export default function App() {
                       questionIdsOnPage={questionIds}
                       nextQuestionId={nextId}
                       scale={1.05}
+                      labelPositions={activeLabelPositions?.labels[String(question.page)]}
+                      pageSize={activeLabelPositions?.pageSizes[String(question.page)]}
                     />
 
                     <div className="choice-grid sprint-choice-grid">
@@ -815,6 +831,8 @@ export default function App() {
                 questionIdsOnPage={questionIdsOnPage}
                 nextQuestionId={nextQuestionOnPage}
                 scale={pdfScale}
+                labelPositions={activeLabelPositions?.labels[String(activePage)]}
+                pageSize={activeLabelPositions?.pageSizes[String(activePage)]}
               />
               <div className="preview-controls">
                 <div className="control-group">

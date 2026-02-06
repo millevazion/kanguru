@@ -19,8 +19,6 @@ type ProgressState = Record<string, Attempt>;
 type Mode = 'practice' | 'review' | 'sprint';
 
 const STORAGE_KEY = 'kangaroo_progress_v2';
-const ANSWER_OVERRIDES_KEY = 'kangaroo_answer_overrides_v1';
-
 const choiceList: Choice[] = ['A', 'B', 'C', 'D', 'E'];
 
 const hintSteps = [
@@ -45,20 +43,6 @@ function saveProgress(progress: ProgressState) {
 
 type AnswerOverrides = Record<string, Record<string, Choice>>;
 
-function loadAnswerOverrides(): AnswerOverrides {
-  try {
-    const stored = localStorage.getItem(ANSWER_OVERRIDES_KEY);
-    if (!stored) return {};
-    return JSON.parse(stored) as AnswerOverrides;
-  } catch {
-    return {};
-  }
-}
-
-function saveAnswerOverrides(overrides: AnswerOverrides) {
-  localStorage.setItem(ANSWER_OVERRIDES_KEY, JSON.stringify(overrides));
-}
-
 export default function App() {
   const [currentSetId, setCurrentSetId] = useState(questionSets[0].id);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -73,7 +57,13 @@ export default function App() {
   const [sprintStarted, setSprintStarted] = useState(false);
   const [sprintSubmitted, setSprintSubmitted] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
-  const [answerOverrides, setAnswerOverrides] = useState<AnswerOverrides>(() => loadAnswerOverrides());
+  const [answerOverrides, setAnswerOverrides] = useState<AnswerOverrides>({});
+  const [serverOverrides, setServerOverrides] = useState<AnswerOverrides>({});
+  const [overridesStatus, setOverridesStatus] = useState<'idle' | 'loading' | 'error'>('idle');
+  const [overridesError, setOverridesError] = useState('');
+  const [adminToken, setAdminToken] = useState('');
+  const [adminStatus, setAdminStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [adminMessage, setAdminMessage] = useState('');
   const [showAdmin, setShowAdmin] = useState(false);
 
   const adminMode = useMemo(() => {
@@ -168,9 +158,38 @@ export default function App() {
 
   const accuracy = totals.answered === 0 ? 0 : Math.round((totals.correct / totals.answered) * 100);
 
+  const overridesDirty = useMemo(
+    () => JSON.stringify(answerOverrides) !== JSON.stringify(serverOverrides),
+    [answerOverrides, serverOverrides]
+  );
+
   useEffect(() => {
-    saveAnswerOverrides(answerOverrides);
-  }, [answerOverrides]);
+    let cancelled = false;
+    const loadOverrides = async () => {
+      setOverridesStatus('loading');
+      setOverridesError('');
+      try {
+        const response = await fetch('/api/answer-overrides');
+        if (!response.ok) {
+          throw new Error(`Failed to load overrides (${response.status})`);
+        }
+        const data = await response.json();
+        if (cancelled) return;
+        const overrides = (data?.overrides ?? {}) as AnswerOverrides;
+        setAnswerOverrides(overrides);
+        setServerOverrides(overrides);
+        setOverridesStatus('idle');
+      } catch (error) {
+        if (cancelled) return;
+        setOverridesStatus('error');
+        setOverridesError(error instanceof Error ? error.message : 'Failed to load overrides.');
+      }
+    };
+    loadOverrides();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const updateAttempt = (id: string, next: Attempt) => {
     const updated = { ...progress, [id]: next };
@@ -203,6 +222,59 @@ export default function App() {
       delete next[activeSet.id];
       return next;
     });
+  };
+
+  const refreshOverrides = async () => {
+    setOverridesStatus('loading');
+    setOverridesError('');
+    try {
+      const response = await fetch('/api/answer-overrides');
+      if (!response.ok) {
+        throw new Error(`Failed to load overrides (${response.status})`);
+      }
+      const data = await response.json();
+      const overrides = (data?.overrides ?? {}) as AnswerOverrides;
+      setAnswerOverrides(overrides);
+      setServerOverrides(overrides);
+      setOverridesStatus('idle');
+      setAdminMessage('Overrides refreshed.');
+      setAdminStatus('saved');
+    } catch (error) {
+      setOverridesStatus('error');
+      setOverridesError(error instanceof Error ? error.message : 'Failed to load overrides.');
+      setAdminStatus('error');
+      setAdminMessage('Refresh failed.');
+    }
+  };
+
+  const saveOverrides = async () => {
+    if (!adminToken) {
+      setAdminStatus('error');
+      setAdminMessage('Admin token required.');
+      return;
+    }
+    setAdminStatus('saving');
+    setAdminMessage('');
+    try {
+      const response = await fetch('/api/answer-overrides', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-token': adminToken
+        },
+        body: JSON.stringify({ overrides: answerOverrides })
+      });
+      if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || `Save failed (${response.status})`);
+      }
+      setServerOverrides(answerOverrides);
+      setAdminStatus('saved');
+      setAdminMessage('Overrides saved.');
+    } catch (error) {
+      setAdminStatus('error');
+      setAdminMessage(error instanceof Error ? error.message : 'Save failed.');
+    }
   };
 
   const recordAnswer = (question: typeof questions[number], choice: Choice) => {
@@ -505,6 +577,19 @@ export default function App() {
               <span className="label">Answered</span>
               <strong>{sprintAnsweredCount} / {sprintQuestions.length || 6}</strong>
             </div>
+            <div className="sprint-dock-block">
+              <span className="label">Year</span>
+              <select
+                value={activeSet.id}
+                onChange={(event) => {
+                  startSprint(event.target.value);
+                }}
+              >
+                {questionSets.map((set) => (
+                  <option key={set.id} value={set.id}>{set.label}</option>
+                ))}
+              </select>
+            </div>
             <div className="sprint-dock-block sprint-dock-actions">
               <button
                 className="primary"
@@ -532,25 +617,6 @@ export default function App() {
                 )}
                 <button className="ghost" onClick={endSprint}>Exit sprint</button>
                 <button className="ghost" onClick={startSprint}>New set</button>
-              </div>
-            </div>
-            <div className="sprint-header-meta">
-              <div className="sprint-meta-block">
-                <span className="label">Year</span>
-                <select
-                  value={activeSet.id}
-                  onChange={(event) => {
-                    startSprint(event.target.value);
-                  }}
-                >
-                  {questionSets.map((set) => (
-                    <option key={set.id} value={set.id}>{set.label}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="sprint-meta-block">
-                <span className="label">Timer</span>
-                <p className="hint">12 minutes total. Starts on “Start sprint”.</p>
               </div>
             </div>
             {!sprintStarted && !sprintSubmitted && (
@@ -671,9 +737,38 @@ export default function App() {
                 <div>
                   <p className="eyebrow">Admin</p>
                   <h3>Answer key overrides</h3>
-                  <p className="hint">Adjust answers for the current year. Overrides are saved locally.</p>
+                  <p className="hint">Adjust answers for the current year. Changes apply globally after saving.</p>
                 </div>
-                <button className="ghost" onClick={resetAnswerOverrides}>Reset overrides</button>
+                <div className="admin-actions">
+                  <button className="ghost" onClick={refreshOverrides} disabled={overridesStatus === 'loading'}>
+                    Refresh
+                  </button>
+                  <button className="ghost" onClick={resetAnswerOverrides}>Reset year</button>
+                  <button className="primary" onClick={saveOverrides} disabled={!overridesDirty || adminStatus === 'saving'}>
+                    {adminStatus === 'saving' ? 'Saving…' : 'Save changes'}
+                  </button>
+                </div>
+              </div>
+              <div className="admin-auth">
+                <label>
+                  <span className="label">Admin token</span>
+                  <input
+                    type="password"
+                    value={adminToken}
+                    onChange={(event) => setAdminToken(event.target.value)}
+                    placeholder="Enter admin token"
+                  />
+                </label>
+                <div className="admin-status">
+                  {overridesStatus === 'loading' && <span className="hint">Loading overrides…</span>}
+                  {overridesStatus === 'error' && <span className="bad">{overridesError}</span>}
+                  {adminMessage && (
+                    <span className={adminStatus === 'error' ? 'bad' : 'good'}>{adminMessage}</span>
+                  )}
+                  {!overridesDirty && overridesStatus === 'idle' && (
+                    <span className="hint">No unsaved changes.</span>
+                  )}
+                </div>
               </div>
               <div className="admin-grid">
                 {questions.map((question) => {

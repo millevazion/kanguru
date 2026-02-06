@@ -6,3 +6,5 @@ dist/
 .tmp/
 tmp_page-01.png
 *.log
+__pycache__/
+*.pyc

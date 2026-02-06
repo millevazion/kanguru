@@ -47,21 +47,21 @@ const buildQuestions = (answerKey: Choice[], pdfUrl: string, label: string, id: 
 
 // Official answer keys from Math Kangaroo USA (grades 7-8).
 const answers2025: Choice[] = [
-  'C', 'E', 'E', 'B', 'A', 'E', 'C', 'B', 'B', 'A',
-  'C', 'A', 'D', 'B', 'D', 'C', 'B', 'D', 'A', 'B',
-  'A', 'D', 'E', 'C', 'C', 'D', 'A', 'A', 'C', 'D'
+  'D', 'E', 'B', 'A', 'B', 'E', 'B', 'C', 'A', 'E',
+  'A', 'C', 'B', 'D', 'D', 'D', 'A', 'B', 'E', 'B',
+  'D', 'A', 'C', 'B', 'C', 'D', 'B', 'E', 'A', 'D'
 ];
 
 const answers2024: Choice[] = [
-  'B', 'C', 'E', 'D', 'D', 'B', 'E', 'C', 'C', 'C',
-  'B', 'A', 'A', 'D', 'A', 'D', 'B', 'C', 'D', 'E',
-  'A', 'E', 'B', 'D', 'D', 'E', 'D', 'B', 'C', 'A'
+  'D', 'E', 'D', 'C', 'B', 'C', 'A', 'B', 'D', 'E',
+  'A', 'D', 'E', 'B', 'D', 'D', 'C', 'C', 'B', 'D',
+  'A', 'C', 'A', 'E', 'E', 'B', 'D', 'B', 'A', 'E'
 ];
 
 const answers2023: Choice[] = [
-  'E', 'A', 'A', 'B', 'C', 'D', 'B', 'B', 'D', 'E',
-  'E', 'C', 'B', 'C', 'E', 'D', 'D', 'D', 'B', 'A',
-  'B', 'C', 'C', 'E', 'D', 'B', 'E', 'A', 'A', 'C'
+  'D', 'E', 'A', 'B', 'D', 'C', 'D', 'A', 'B', 'A',
+  'B', 'E', 'E', 'C', 'B', 'D', 'A', 'D', 'B', 'D',
+  'D', 'E', 'B', 'C', 'E', 'A', 'C', 'C', 'B', 'D'
 ];
 
 export const questionSets: QuestionSet[] = [

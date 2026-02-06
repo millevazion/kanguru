@@ -29,7 +29,7 @@
   },
   "A8": {
     "hint": "Look closely at the directions and distances the cars will travel. Think about where they will end up after 5 seconds.",
-    "story": "To determine which cars will collide, we need to track their movements based on their starting positions and directions. By calculating where each car will be after 5 seconds, we can see if any of them end up in the same spot. The correct answer is B, which indicates the two cars that will meet."
+    "story": "To determine which cars will collide, we need to track their movements based on their starting positions and directions. By calculating where each car will be after 5 seconds, we can see if any of them end up in the same spot. The correct answer is A, which indicates the two cars that will meet."
   },
   "A9": {
     "hint": "First, calculate how many learner drivers have already passed the theory test. Then, determine how many more need to pass for half of the total to have passed.",
@@ -101,7 +101,7 @@
   },
   "C6": {
     "hint": "To find the average speed, you need to calculate the total distance and the total time taken for all three laps.",
-    "story": "Elisabeth runs three laps at different speeds. To find her average speed, we first need to determine how long each lap takes based on her speed. Then, we can use the total distance and total time to calculate her average speed, which is given as option B."
+    "story": "Elisabeth runs three laps at different speeds. To find her average speed, we first need to determine how long each lap takes based on her speed. Then, we can use the total distance and total time to calculate her average speed, which is given as option A."
   },
   "C7": {
     "hint": "Think about how the total number of mice remains the same, even though they moved houses. You need to compare the numbers from yesterday and today to find out how many mice changed their location.",

@@ -41,7 +41,7 @@
   },
   "B1": {
     "hint": "Look closely at the sums of the numbers in the rows and columns. You need to find a piece that balances the total.",
-    "story": "To solve this problem, we need to ensure that the total of each row and column in the 4x4 square is the same. By examining the existing pieces and their values, we can deduce what the fourth piece must look like to maintain this balance. The correct piece is option B."
+    "story": "To solve this problem, we need to ensure that the total of each row and column in the 4x4 square is the same. By examining the existing pieces and their values, we can deduce what the fourth piece must look like to maintain this balance. The correct piece is option A."
   },
   "B2": {
     "hint": "Think about how many different pairs can be formed from the three friends and how the remaining friend will be assigned to one of the cabs.",

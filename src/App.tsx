@@ -653,7 +653,10 @@ export default function App() {
                   <article key={question.id} className="sprint-item">
                     <div className="sprint-question-head">
                       <div>
-                        <p className="eyebrow">Question {question.id}</p>
+                        <div className="question-label">
+                          <span className="question-tag">Question {question.id}</span>
+                          <span className="question-focus">Answer this question</span>
+                        </div>
                         <h3>{question.points}-point</h3>
                       </div>
                       {sprintSubmitted && (
@@ -813,7 +816,10 @@ export default function App() {
           <section className="panel left">
             <div className="question-head">
               <div>
-                <p className="eyebrow">Question {currentQuestion.id}</p>
+                <div className="question-label">
+                  <span className="question-tag">Question {currentQuestion.id}</span>
+                  <span className="question-focus">Answer this question</span>
+                </div>
                 <h2>{currentQuestion.points}-point challenge</h2>
                 <p className="hint">This is the exact question card (with drawings).</p>
               </div>

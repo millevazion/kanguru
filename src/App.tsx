@@ -657,7 +657,7 @@ export default function App() {
                           <span className="question-tag">Question {question.id}</span>
                           <span className="question-focus">Answer this question</span>
                         </div>
-                        <h3>{question.points}-point</h3>
+                        <h3 className="question-title">{question.points}-point challenge</h3>
                       </div>
                       {sprintSubmitted && (
                         <span className={`badge ${isCorrect ? 'good' : 'bad'}`}>
@@ -820,8 +820,7 @@ export default function App() {
                   <span className="question-tag">Question {currentQuestion.id}</span>
                   <span className="question-focus">Answer this question</span>
                 </div>
-                <h2>{currentQuestion.points}-point challenge</h2>
-                <p className="hint">This is the exact question card (with drawings).</p>
+                <h2 className="question-title">{currentQuestion.points}-point challenge</h2>
               </div>
               <div className="nav-buttons">
                 <button className="ghost" onClick={prevQuestion}>Prev</button>

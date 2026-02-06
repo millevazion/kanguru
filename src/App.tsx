@@ -655,9 +655,8 @@ export default function App() {
                       <div>
                         <div className="question-label">
                           <span className="question-tag">Question {question.id}</span>
-                          <span className="question-focus">Answer this question</span>
+                          <span className="question-points">{question.points}-point</span>
                         </div>
-                        <h3 className="question-title">{question.points}-point challenge</h3>
                       </div>
                       {sprintSubmitted && (
                         <span className={`badge ${isCorrect ? 'good' : 'bad'}`}>
@@ -818,9 +817,8 @@ export default function App() {
               <div>
                 <div className="question-label">
                   <span className="question-tag">Question {currentQuestion.id}</span>
-                  <span className="question-focus">Answer this question</span>
+                  <span className="question-points">{currentQuestion.points}-point</span>
                 </div>
-                <h2 className="question-title">{currentQuestion.points}-point challenge</h2>
               </div>
               <div className="nav-buttons">
                 <button className="ghost" onClick={prevQuestion}>Prev</button>

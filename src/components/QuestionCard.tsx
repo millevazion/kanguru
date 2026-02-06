@@ -83,25 +83,21 @@ export default function QuestionCard({ url, page, questionId, questionIdsOnPage,
 
         const idSet = new Set(questionIdsOnPage.map(normalize));
         const positionsMap = new Map<string, Position>();
-        const labelRegex = /([ABC]\s*10|[ABC]\s*[1-9])/g;
+        const leftThreshold = 32;
 
         for (const line of lines) {
           const sorted = [...line.items].sort((a, b) => a.x - b.x);
-          let lineText = '';
-          let lastX = sorted[0]?.x ?? 0;
-          for (const piece of sorted) {
-            if (piece.x - lastX > 8) lineText += ' ';
-            lineText += piece.text;
-            lastX = piece.x;
-          }
-          const cleaned = lineText.toUpperCase().replace(/[^A-Z0-9\s]/g, ' ');
-          const matches = cleaned.matchAll(labelRegex);
-          for (const match of matches) {
-            const id = match[0].replace(/\s+/g, '');
-            if (!idSet.has(normalize(id))) continue;
-            if (!positionsMap.has(id)) {
-              const minX = sorted[0]?.x ?? 0;
-              positionsMap.set(id, { id, x: minX, y: line.y });
+          if (sorted.length === 0) continue;
+          const minX = sorted[0].x;
+          for (let i = 0; i < sorted.length; i += 1) {
+            const current = normalize(sorted[i].text);
+            if (idSet.has(current) && sorted[i].x - minX <= leftThreshold && !positionsMap.has(current)) {
+              positionsMap.set(current, { id: current, x: sorted[i].x, y: line.y });
+            }
+            const nextText = sorted[i + 1]?.text ?? '';
+            const combined = normalize(sorted[i].text + nextText);
+            if (idSet.has(combined) && sorted[i].x - minX <= leftThreshold && !positionsMap.has(combined)) {
+              positionsMap.set(combined, { id: combined, x: sorted[i].x, y: line.y });
             }
           }
         }
@@ -110,11 +106,13 @@ export default function QuestionCard({ url, page, questionId, questionIdsOnPage,
           const fallbackFind = (targetId?: string) => {
             if (!targetId) return null;
             const target = normalize(targetId);
+            const minX = items.length ? Math.min(...items.map((item) => item.x)) : 0;
             for (const item of textContent.items) {
               const text = normalize('str' in item ? item.str : '');
               if (!text) continue;
               if (text === target || text.includes(target)) {
                 const [x, y] = viewport.convertToViewportPoint(item.transform[4], item.transform[5]);
+                if (x - minX > leftThreshold) continue;
                 return { x, y };
               }
             }

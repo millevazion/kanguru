@@ -510,6 +510,84 @@ button:disabled {
   margin-top: 10px;
 }
 
+.sprint-layout {
+  display: grid;
+  gap: 20px;
+}
+
+.sprint-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.sprint-panel-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.sprint-panel-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.sprint-panel-meta {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.sprint-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.sprint-item {
+  background: #fff;
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 12px;
+}
+
+.sprint-question-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.sprint-choice-grid {
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  margin: 10px 0;
+}
+
+.sprint-item .choice {
+  padding: 10px 12px;
+  border-radius: 14px;
+}
+
+.sprint-item .choice-text {
+  font-size: 0.85rem;
+}
+
+.sprint-item .question-card {
+  max-height: 50vh;
+}
+
+.sprint-result {
+  background: var(--bg-alt);
+  border-radius: 16px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 6px;
+}
+
 .sprint-chip {
   background: #fff;
   border: 1px solid rgba(31, 28, 25, 0.2);

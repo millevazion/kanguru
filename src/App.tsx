@@ -53,6 +53,7 @@ export default function App() {
   const [sprintSet, setSprintSet] = useState<number[]>([]);
   const [sprintRemaining, setSprintRemaining] = useState<number | null>(null);
   const [sprintPaused, setSprintPaused] = useState(false);
+  const [sprintSubmitted, setSprintSubmitted] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
 
   const activeSet = questionSets.find((set) => set.id === currentSetId) ?? questionSets[0];
@@ -60,15 +61,43 @@ export default function App() {
 
   const currentQuestion = questions[currentIndex];
   const attempt = progress[`${activeSet.id}-${currentQuestion.id}`] ?? {};
-  const explanationEntry = explanations[activeSet.id]?.[currentQuestion.id] as
-    | string
-    | { story?: string; hint?: string }
-    | undefined;
-  const storyExplanation = typeof explanationEntry === 'string' ? explanationEntry : explanationEntry?.story ?? '';
-  const contextualHint = typeof explanationEntry === 'string' ? '' : explanationEntry?.hint ?? '';
   const activePage = pageOverride ?? currentQuestion.page;
+  const questionIdsByPage = useMemo(() => {
+    const map = new Map<number, string[]>();
+    questions.forEach((question) => {
+      const list = map.get(question.page) ?? [];
+      list.push(question.id);
+      map.set(question.page, list);
+    });
+    return map;
+  }, [questions]);
+  const getQuestionIdsOnPage = (page: number) => questionIdsByPage.get(page) ?? [];
+  const getNextQuestionIdOnPage = (question: typeof questions[number]) => {
+    const ids = questionIdsByPage.get(question.page) ?? [];
+    const index = ids.indexOf(question.id);
+    return index >= 0 ? ids[index + 1] : undefined;
+  };
+  const getExplanationFor = (questionId: string) => {
+    const entry = explanations[activeSet.id]?.[questionId] as
+      | string
+      | { story?: string; hint?: string }
+      | undefined;
+    if (!entry) return { story: '', hint: '' };
+    if (typeof entry === 'string') return { story: entry, hint: '' };
+    return { story: entry.story ?? '', hint: entry.hint ?? '' };
+  };
+  const { story: storyExplanation, hint: contextualHint } = getExplanationFor(currentQuestion.id);
   const sprintActive = view === 'sprint' && sprintRemaining !== null;
   const sprintDone = sprintRemaining === 0;
+  const sprintFinished = sprintSubmitted || sprintDone;
+  const sprintQuestions = useMemo(
+    () => sprintSet.flatMap((index) => (questions[index] ? [questions[index]] : [])),
+    [sprintSet, questions]
+  );
+  const sprintAnsweredCount = useMemo(
+    () => sprintQuestions.filter((question) => progress[`${activeSet.id}-${question.id}`]?.answer).length,
+    [sprintQuestions, progress, activeSet.id]
+  );
 
   const totals = useMemo(() => {
     const attempts = Object.entries(progress)
@@ -104,13 +133,19 @@ export default function App() {
     saveProgress(updated);
   };
 
-  const handleAnswer = (choice: Choice) => {
-    updateAttempt(`${activeSet.id}-${currentQuestion.id}`, {
-      ...attempt,
+  const recordAnswer = (question: typeof questions[number], choice: Choice) => {
+    const key = `${activeSet.id}-${question.id}`;
+    const existing = progress[key] ?? {};
+    updateAttempt(key, {
+      ...existing,
       answer: choice,
-      isCorrect: choice === currentQuestion.correct,
+      isCorrect: choice === question.correct,
       timestamp: Date.now()
     });
+  };
+
+  const handleAnswer = (choice: Choice) => {
+    recordAnswer(currentQuestion, choice);
   };
 
   const handleConfidence = (level: 1 | 2 | 3) => {
@@ -131,20 +166,22 @@ export default function App() {
   };
 
   const startSprint = () => {
-    const available = questions
-      .map((q, index) => ({ q, index }))
-      .filter(({ q }) => !progress[`${activeSet.id}-${q.id}`]?.answer)
-      .map(({ index }) => index);
-    const picked = available.length >= 6 ? available.sort(() => 0.5 - Math.random()).slice(0, 6) : available;
+    const pool = questions.map((_, index) => index);
+    for (let i = pool.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    const picked = pool.slice(0, Math.min(6, pool.length));
     setSprintSet(picked);
     setSprintRemaining(12 * 60);
     setSprintPaused(false);
+    setSprintSubmitted(false);
     if (picked.length > 0) {
       setCurrentIndex(picked[0]);
-      setView('sprint');
-    } else {
-      setView('sprint');
     }
+    setPageOverride(null);
+    setShowFullPage(false);
+    setView('sprint');
   };
 
   const pauseSprint = () => setSprintPaused(true);
@@ -154,6 +191,7 @@ export default function App() {
     setSprintRemaining(null);
     setSprintPaused(false);
     setSprintSet([]);
+    setSprintSubmitted(false);
   };
 
   const endSprint = () => {
@@ -161,13 +199,26 @@ export default function App() {
     setView('practice');
   };
 
+  const submitSprint = () => {
+    if (sprintSubmitted) return;
+    setSprintSubmitted(true);
+    setSprintPaused(true);
+  };
+
   useEffect(() => {
-    if (!sprintActive || sprintPaused || sprintRemaining === null || sprintRemaining <= 0) return;
+    if (!sprintActive || sprintPaused || sprintRemaining === null || sprintRemaining <= 0 || sprintSubmitted) return;
     const interval = setInterval(() => {
       setSprintRemaining((value) => (value === null ? null : Math.max(0, value - 1)));
     }, 1000);
     return () => clearInterval(interval);
-  }, [sprintActive, sprintPaused, sprintRemaining]);
+  }, [sprintActive, sprintPaused, sprintRemaining, sprintSubmitted]);
+
+  useEffect(() => {
+    if (sprintRemaining === 0 && !sprintSubmitted) {
+      setSprintSubmitted(true);
+      setSprintPaused(true);
+    }
+  }, [sprintRemaining, sprintSubmitted]);
 
   const formatTime = (value: number) => {
     const minutes = Math.floor(value / 60).toString().padStart(2, '0');
@@ -201,14 +252,13 @@ export default function App() {
     setShowExplanation(false);
   }, [currentQuestion.id, activeSet.id]);
 
-  const questionIdsOnPage = useMemo(() => {
-    return questions.filter((q) => q.page === activePage).map((q) => q.id);
-  }, [questions, activePage]);
+  const questionIdsOnPage = useMemo(() => questionIdsByPage.get(activePage) ?? [], [questionIdsByPage, activePage]);
 
   const nextQuestionOnPage = useMemo(() => {
-    const next = questions.slice(currentIndex + 1).find((q) => q.page === activePage);
-    return next?.id;
-  }, [questions, currentIndex, activePage]);
+    const ids = questionIdsByPage.get(activePage) ?? [];
+    const index = ids.indexOf(currentQuestion.id);
+    return index >= 0 ? ids[index + 1] : undefined;
+  }, [questionIdsByPage, activePage, currentQuestion.id]);
 
   return (
     <div className="app">
@@ -218,14 +268,22 @@ export default function App() {
             <p className="eyebrow">Sprint mode</p>
             <strong className="sprint-time">{formatTime(sprintRemaining ?? 0)}</strong>
             <span className="sprint-meta">
-              {sprintPaused ? 'Paused' : 'Running'} · {sprintSet.length} questions
+              {sprintSubmitted ? 'Submitted' : sprintPaused ? 'Paused' : 'Running'} · {sprintAnsweredCount}/{sprintQuestions.length || 6} answered
             </span>
             {sprintDone && <span className="badge bad">Time's up</span>}
+            {sprintSubmitted && !sprintDone && <span className="badge good">Submitted</span>}
           </div>
           <div className="sprint-actions">
-            <button className="ghost" onClick={sprintPaused ? resumeSprint : pauseSprint}>
-              {sprintPaused ? 'Resume' : 'Pause'}
-            </button>
+            {!sprintFinished && (
+              <button className="ghost" onClick={sprintPaused ? resumeSprint : pauseSprint}>
+                {sprintPaused ? 'Resume' : 'Pause'}
+              </button>
+            )}
+            {!sprintSubmitted && (
+              <button className="primary" onClick={submitSprint} disabled={sprintQuestions.length === 0}>
+                Submit sprint
+              </button>
+            )}
             <button className="ghost" onClick={resetSprint}>Reset sprint</button>
             <button className="ghost" onClick={endSprint}>End sprint</button>
           </div>
@@ -270,9 +328,9 @@ export default function App() {
           <span className="mode-title">Review</span>
           <span className="mode-desc">Return to mistakes and fix them.</span>
         </button>
-        <button className={`mode-card ${view === 'sprint' ? 'active' : ''}`} onClick={() => setView('sprint')}>
+        <button className={`mode-card ${view === 'sprint' ? 'active' : ''}`} onClick={startSprint}>
           <span className="mode-title">Sprint</span>
-          <span className="mode-desc">6 questions in 12 minutes.</span>
+          <span className="mode-desc">6 questions, submit to reveal answers.</span>
         </button>
         <button className="mode-card ghost" onClick={resetProgress}>
           <span className="mode-title">Reset</span>
@@ -318,7 +376,7 @@ export default function App() {
         </div>
         <div className="toolbar-action">
           <button className="primary" onClick={startSprint}>Sprint: 6 questions</button>
-          <span className="hint">12 minutes. Pause anytime.</span>
+          <span className="hint">12 minutes. Submit to see answers.</span>
         </div>
       </section>
 
@@ -356,188 +414,260 @@ export default function App() {
         </section>
       )}
 
-      <main className="grid">
-        <section className="panel left">
-          <div className="question-head">
-            <div>
-              <p className="eyebrow">Question {currentQuestion.id}</p>
-              <h2>{currentQuestion.points}-point challenge</h2>
-              <p className="hint">This is the exact question card (with drawings).</p>
-            </div>
-            <div className="nav-buttons">
-              <button className="ghost" onClick={prevQuestion}>Prev</button>
-              <button className="ghost" onClick={nextQuestion}>Next</button>
-            </div>
-          </div>
-
-          <div className="question-preview">
-            <QuestionCard
-              url={activeSet.pdfUrl}
-              page={activePage}
-              questionId={currentQuestion.id}
-              questionIdsOnPage={questionIdsOnPage}
-              nextQuestionId={nextQuestionOnPage}
-              scale={pdfScale}
-            />
-            <div className="preview-controls">
-              <div className="control-group">
-                <button className="ghost" onClick={() => setPdfScale((s) => Math.max(0.8, s - 0.1))}>-</button>
-                <span className="scale">{Math.round(pdfScale * 100)}%</span>
-                <button className="ghost" onClick={() => setPdfScale((s) => Math.min(1.8, s + 0.1))}>+</button>
-                <button className="ghost" onClick={() => setPdfScale(1.2)}>Fit</button>
+      {view === 'sprint' ? (
+        <main className="sprint-layout">
+          <section className="panel sprint-panel">
+            <div className="sprint-panel-head">
+              <div>
+                <p className="eyebrow">Sprint</p>
+                <h2>Six questions. One run.</h2>
+                <p className="hint">Answer all six, then submit to see the answers and explanations.</p>
               </div>
-              <button className="ghost" onClick={() => setShowFullPage((value) => !value)}>
-                {showFullPage ? 'Hide full page' : 'Show full page'}
-              </button>
-            </div>
-          </div>
-
-          <p className="label">Pick an answer</p>
-          <div className="choice-grid">
-            {choiceList.map((choice) => {
-              const isSelected = attempt.answer === choice;
-              const isCorrect = attempt.isCorrect && isSelected;
-              const isWrong = attempt.answer === choice && attempt.isCorrect === false;
-              return (
-                <button
-                  key={choice}
-                  className={`choice ${isSelected ? 'selected' : ''} ${isCorrect ? 'correct' : ''} ${isWrong ? 'wrong' : ''}`}
-                  onClick={() => handleAnswer(choice)}
-                >
-                  <span className="choice-letter">{choice}</span>
-                  <span className="choice-text">Answer {choice}</span>
+              <div className="sprint-panel-actions">
+                <button className="primary" onClick={submitSprint} disabled={sprintSubmitted || sprintQuestions.length === 0}>
+                  {sprintSubmitted ? 'Submitted' : 'Submit sprint'}
                 </button>
-              );
-            })}
-          </div>
+                <button className="ghost" onClick={startSprint}>New sprint</button>
+              </div>
+            </div>
+            <div className="sprint-panel-meta">
+              <span className="label">Answered</span>
+              <strong>{sprintAnsweredCount} / {sprintQuestions.length || 6}</strong>
+              <span className="label">Time</span>
+              <strong>{formatTime(sprintRemaining ?? 0)}</strong>
+            </div>
+          </section>
 
-          <div className="feedback">
-            {attempt.answer ? (
-              attempt.isCorrect ? (
-                <p className="good">Nice! You picked {attempt.answer}. Keep the momentum.</p>
-              ) : (
-                <p className="bad">Not quite. Correct answer is {currentQuestion.correct}. Try a hint.</p>
-              )
+          <section className="sprint-stack">
+            {sprintQuestions.length === 0 ? (
+              <p className="neutral">Start a sprint to load questions.</p>
             ) : (
-              <p className="neutral">Pick an option when ready. Speed matters, but calm thinking wins.</p>
+              sprintQuestions.map((question) => {
+                const sprintAttempt = progress[`${activeSet.id}-${question.id}`] ?? {};
+                const answer = sprintAttempt.answer;
+                const isCorrect = answer ? answer === question.correct : false;
+                const { story, hint } = getExplanationFor(question.id);
+                const questionIds = getQuestionIdsOnPage(question.page);
+                const nextId = getNextQuestionIdOnPage(question);
+                return (
+                  <article key={question.id} className="sprint-item">
+                    <div className="sprint-question-head">
+                      <div>
+                        <p className="eyebrow">Question {question.id}</p>
+                        <h3>{question.points}-point</h3>
+                      </div>
+                      {sprintSubmitted && (
+                        <span className={`badge ${isCorrect ? 'good' : 'bad'}`}>
+                          {isCorrect ? 'Correct' : 'Incorrect'}
+                        </span>
+                      )}
+                    </div>
+
+                    <QuestionCard
+                      url={activeSet.pdfUrl}
+                      page={question.page}
+                      questionId={question.id}
+                      questionIdsOnPage={questionIds}
+                      nextQuestionId={nextId}
+                      scale={1.05}
+                    />
+
+                    <div className="choice-grid sprint-choice-grid">
+                      {choiceList.map((choice) => {
+                        const isSelected = answer === choice;
+                        const reveal = sprintSubmitted;
+                        const showCorrect = reveal && choice === question.correct;
+                        const showWrong = reveal && isSelected && choice !== question.correct;
+                        return (
+                          <button
+                            key={choice}
+                            className={`choice ${isSelected ? 'selected' : ''} ${showCorrect ? 'correct' : ''} ${showWrong ? 'wrong' : ''}`}
+                            onClick={() => recordAnswer(question, choice)}
+                            disabled={sprintSubmitted}
+                          >
+                            <span className="choice-letter">{choice}</span>
+                            <span className="choice-text">Answer {choice}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {sprintSubmitted && (
+                      <div className="sprint-result">
+                        <p className={isCorrect ? 'good' : 'bad'}>
+                          Your answer: {answer ?? '—'} · Correct: {question.correct}
+                        </p>
+                        {story ? (
+                          <p>{story}</p>
+                        ) : (
+                          <p className="neutral">Explanation not loaded yet for this year.</p>
+                        )}
+                        {hint && <p className="hint">Hint: {hint}</p>}
+                        {story && <p className="hint">Source: {explanationSources[activeSet.id]}</p>}
+                      </div>
+                    )}
+                  </article>
+                );
+              })
             )}
-          </div>
+          </section>
+        </main>
+      ) : (
+        <main className="grid">
+          <section className="panel left">
+            <div className="question-head">
+              <div>
+                <p className="eyebrow">Question {currentQuestion.id}</p>
+                <h2>{currentQuestion.points}-point challenge</h2>
+                <p className="hint">This is the exact question card (with drawings).</p>
+              </div>
+              <div className="nav-buttons">
+                <button className="ghost" onClick={prevQuestion}>Prev</button>
+                <button className="ghost" onClick={nextQuestion}>Next</button>
+              </div>
+            </div>
 
-          <div className="confidence">
-            <div className="confidence-head">
-              <p className="label">How sure were you?</p>
-              <span className="hint">This helps you spot guesses vs real understanding.</span>
-            </div>
-            <div className="confidence-row">
-              {[
-                { value: 1, label: 'Guess' },
-                { value: 2, label: 'Maybe' },
-                { value: 3, label: 'Sure' }
-              ].map((level) => (
-                <button
-                  key={level.value}
-                  className={`pill ${attempt.confidence === level.value ? 'active' : ''}`}
-                  onClick={() => handleConfidence(level.value as 1 | 2 | 3)}
-                >
-                  {level.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="coach">
-            <div className="coach-head">
-              <p className="label">Need a hint?</p>
-              <button className="ghost" onClick={revealHint}>
-                {attempt.hintStep ? 'Next hint' : 'Show hint'}
-              </button>
-            </div>
-            <div className="hint-stack">
-              {contextualHint && (attempt.hintStep ?? 0) >= 1 && (
-                <div className="hint-card">{contextualHint}</div>
-              )}
-              {hintSteps.slice(0, Math.max(0, (attempt.hintStep ?? 0) - (contextualHint ? 1 : 0))).map((hint) => (
-                <div key={hint} className="hint-card">{hint}</div>
-              ))}
-              {(attempt.hintStep ?? 0) === 0 && <p className="neutral">Hints appear here, one at a time.</p>}
-            </div>
-          </div>
-
-          <div className="explanation">
-            <div className="coach-head">
-              <p className="label">Story explanation</p>
-              <button
-                className="ghost"
-                onClick={() => setShowExplanation((value) => !value)}
-                disabled={!attempt.answer}
-              >
-                {showExplanation ? 'Hide' : 'Show'}
-              </button>
-            </div>
-            {showExplanation ? (
-              storyExplanation ? (
-                <div className="hint-card">
-                  <p>{storyExplanation}</p>
-                  <p className="hint">Source: {explanationSources[activeSet.id]}</p>
-                </div>
-              ) : (
-                <p className="neutral">
-                  Explanation not loaded yet for this year. Add the solution brochure to generate it.
-                </p>
-              )
-            ) : (
-              <p className="neutral">
-                {attempt.answer ? 'Tap “Show” to see the explanation.' : 'Answer first to unlock the story explanation.'}
-              </p>
-            )}
-          </div>
-
-          {showFullPage && (
-            <div className="full-page">
-              <div className="pdf-controls">
-                <div>
-                  <p className="eyebrow">Full page view</p>
-                  <p className="hint">Use this if the cropped card feels too tight.</p>
-                </div>
+            <div className="question-preview">
+              <QuestionCard
+                url={activeSet.pdfUrl}
+                page={activePage}
+                questionId={currentQuestion.id}
+                questionIdsOnPage={questionIdsOnPage}
+                nextQuestionId={nextQuestionOnPage}
+                scale={pdfScale}
+              />
+              <div className="preview-controls">
                 <div className="control-group">
                   <button className="ghost" onClick={() => setPdfScale((s) => Math.max(0.8, s - 0.1))}>-</button>
                   <span className="scale">{Math.round(pdfScale * 100)}%</span>
                   <button className="ghost" onClick={() => setPdfScale((s) => Math.min(1.8, s + 0.1))}>+</button>
+                  <button className="ghost" onClick={() => setPdfScale(1.2)}>Fit</button>
                 </div>
+                <button className="ghost" onClick={() => setShowFullPage((value) => !value)}>
+                  {showFullPage ? 'Hide full page' : 'Show full page'}
+                </button>
               </div>
-              <PdfPageViewer url={activeSet.pdfUrl} page={activePage} scale={pdfScale} />
             </div>
-          )}
 
-          {view === 'sprint' && (
-            <div className="sprint">
-              <p className="label">Sprint lineup</p>
-              <p className="hint">Tap a chip to jump within the sprint set.</p>
-              <div className="sprint-list">
-                {sprintSet.length === 0 && <span className="neutral">Start a sprint to load questions.</span>}
-                {sprintSet.map((index) => {
-                  const q = questions[index];
-                  const status = progress[`${activeSet.id}-${q.id}`]?.isCorrect;
-                  return (
-                    <button
-                      key={q.id}
-                      className={`sprint-chip ${currentIndex === index ? 'active' : ''}`}
-                      onClick={() => {
-                        setCurrentIndex(index);
-                        setPageOverride(null);
-                      }}
-                    >
-                      {q.id}
-                      {status === true && <span className="badge good">✓</span>}
-                      {status === false && <span className="badge bad">×</span>}
-                    </button>
-                  );
-                })}
+            <p className="label">Pick an answer</p>
+            <div className="choice-grid">
+              {choiceList.map((choice) => {
+                const isSelected = attempt.answer === choice;
+                const isCorrect = attempt.isCorrect && isSelected;
+                const isWrong = attempt.answer === choice && attempt.isCorrect === false;
+                return (
+                  <button
+                    key={choice}
+                    className={`choice ${isSelected ? 'selected' : ''} ${isCorrect ? 'correct' : ''} ${isWrong ? 'wrong' : ''}`}
+                    onClick={() => handleAnswer(choice)}
+                  >
+                    <span className="choice-letter">{choice}</span>
+                    <span className="choice-text">Answer {choice}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="feedback">
+              {attempt.answer ? (
+                attempt.isCorrect ? (
+                  <p className="good">Nice! You picked {attempt.answer}. Keep the momentum.</p>
+                ) : (
+                  <p className="bad">Not quite. Correct answer is {currentQuestion.correct}. Try a hint.</p>
+                )
+              ) : (
+                <p className="neutral">Pick an option when ready. Speed matters, but calm thinking wins.</p>
+              )}
+            </div>
+
+            <div className="confidence">
+              <div className="confidence-head">
+                <p className="label">How sure were you?</p>
+                <span className="hint">This helps you spot guesses vs real understanding.</span>
+              </div>
+              <div className="confidence-row">
+                {[
+                  { value: 1, label: 'Guess' },
+                  { value: 2, label: 'Maybe' },
+                  { value: 3, label: 'Sure' }
+                ].map((level) => (
+                  <button
+                    key={level.value}
+                    className={`pill ${attempt.confidence === level.value ? 'active' : ''}`}
+                    onClick={() => handleConfidence(level.value as 1 | 2 | 3)}
+                  >
+                    {level.label}
+                  </button>
+                ))}
               </div>
             </div>
-          )}
-        </section>
-      </main>
+
+            <div className="coach">
+              <div className="coach-head">
+                <p className="label">Need a hint?</p>
+                <button className="ghost" onClick={revealHint}>
+                  {attempt.hintStep ? 'Next hint' : 'Show hint'}
+                </button>
+              </div>
+              <div className="hint-stack">
+                {contextualHint && (attempt.hintStep ?? 0) >= 1 && (
+                  <div className="hint-card">{contextualHint}</div>
+                )}
+                {hintSteps.slice(0, Math.max(0, (attempt.hintStep ?? 0) - (contextualHint ? 1 : 0))).map((hint) => (
+                  <div key={hint} className="hint-card">{hint}</div>
+                ))}
+                {(attempt.hintStep ?? 0) === 0 && <p className="neutral">Hints appear here, one at a time.</p>}
+              </div>
+            </div>
+
+            <div className="explanation">
+              <div className="coach-head">
+                <p className="label">Story explanation</p>
+                <button
+                  className="ghost"
+                  onClick={() => setShowExplanation((value) => !value)}
+                  disabled={!attempt.answer}
+                >
+                  {showExplanation ? 'Hide' : 'Show'}
+                </button>
+              </div>
+              {showExplanation ? (
+                storyExplanation ? (
+                  <div className="hint-card">
+                    <p>{storyExplanation}</p>
+                    <p className="hint">Source: {explanationSources[activeSet.id]}</p>
+                  </div>
+                ) : (
+                  <p className="neutral">
+                    Explanation not loaded yet for this year. Add the solution brochure to generate it.
+                  </p>
+                )
+              ) : (
+                <p className="neutral">
+                  {attempt.answer ? 'Tap “Show” to see the explanation.' : 'Answer first to unlock the story explanation.'}
+                </p>
+              )}
+            </div>
+
+            {showFullPage && (
+              <div className="full-page">
+                <div className="pdf-controls">
+                  <div>
+                    <p className="eyebrow">Full page view</p>
+                    <p className="hint">Use this if the cropped card feels too tight.</p>
+                  </div>
+                  <div className="control-group">
+                    <button className="ghost" onClick={() => setPdfScale((s) => Math.max(0.8, s - 0.1))}>-</button>
+                    <span className="scale">{Math.round(pdfScale * 100)}%</span>
+                    <button className="ghost" onClick={() => setPdfScale((s) => Math.min(1.8, s + 0.1))}>+</button>
+                  </div>
+                </div>
+                <PdfPageViewer url={activeSet.pdfUrl} page={activePage} scale={pdfScale} />
+              </div>
+            )}
+          </section>
+        </main>
+      )}
 
       <footer className="footer">
         <p>Tip: If a question feels hard, take a hint and try again before checking the answer.</p>
